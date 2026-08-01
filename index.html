@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -39,19 +39,9 @@
     --measure: 470px;
   }
 
-  html[data-theme="dark"] {
-    --bg: #171717;
-    --ink: #ffffff;
-    --grey: #8f8f8f;
-    --grey-line: #5a5a5a;
-    --grey-dim: #616161;
-    --rule: #2e2e2e;
-    --panel: #212121;
-  }
-
   * { box-sizing: border-box; }
   html, body { height: 100%; }
-  html { color-scheme: light dark; }
+  html { color-scheme: light; }
 
   body {
     margin: 0;
@@ -191,28 +181,11 @@
   footer {
     display: flex;
     align-items: center;
-    justify-content: space-between;
     padding: 16px var(--gutter) 24px;
     font-size: var(--fs-footer);
   }
 
   .copyright { color: var(--grey-dim); }
-
-  .theme-toggle { display: flex; gap: 16px; }
-
-  .theme-btn {
-    background: none;
-    border: none;
-    padding: 0;
-    font-family: inherit;
-    font-size: inherit;
-    font-weight: 400;
-    cursor: pointer;
-    color: var(--grey-dim);
-    transition: color 0.15s ease;
-  }
-
-  .theme-btn[aria-pressed="true"] { color: var(--ink); }
 
   @media (max-width: 480px) {
     .page { padding: var(--sp-top) clamp(20px, 8vw, 40px) 0; }
@@ -258,8 +231,8 @@
       <section>
         <p class="label">More &amp; Connect</p>
         <div class="link-list">
-          <a class="link" href="#">Resume</a>
-          <a class="link" href="mailto:you@example.com">Email</a>
+          <a class="link" href="./resume.pdf" target="_blank" rel="noopener noreferrer">Resume</a>
+          <a class="link" href="mailto:yufeili1025@gmail.com">Email</a>
         </div>
       </section>
     </div>
@@ -267,10 +240,6 @@
 
   <footer>
     <span class="copyright">© 2026</span>
-    <div class="theme-toggle">
-      <button class="theme-btn" id="btn-light" aria-pressed="true">Light</button>
-      <button class="theme-btn" id="btn-dark" aria-pressed="false">Dark</button>
-    </div>
   </footer>
 
   <script>
@@ -282,23 +251,6 @@
       void body.offsetWidth; /* force a reflow so the class re-application restarts it */
       body.classList.add('enter');
     });
-
-    const root = document.documentElement;
-    const btnLight = document.getElementById('btn-light');
-    const btnDark = document.getElementById('btn-dark');
-
-    function setTheme(theme) {
-      root.setAttribute('data-theme', theme);
-      btnLight.setAttribute('aria-pressed', theme === 'light');
-      btnDark.setAttribute('aria-pressed', theme === 'dark');
-    }
-
-    btnLight.addEventListener('click', () => setTheme('light'));
-    btnDark.addEventListener('click', () => setTheme('dark'));
-
-    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      setTheme('dark');
-    }
   </script>
 </body>
 </html>

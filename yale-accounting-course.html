@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -39,18 +39,8 @@
     --measure: 470px;
   }
 
-  html[data-theme="dark"] {
-    --bg: #171717;
-    --ink: #ffffff;
-    --grey: #8f8f8f;
-    --grey-line: #5a5a5a;
-    --grey-dim: #616161;
-    --rule: #2e2e2e;
-    --panel: #212121;
-  }
-
   * { box-sizing: border-box; }
-  html { color-scheme: light dark; scroll-behavior: smooth; }
+  html { color-scheme: light; scroll-behavior: smooth; }
 
   body {
     margin: 0;
@@ -89,6 +79,11 @@
     grid-column: 3;
     justify-self: start;
     align-self: start;
+    /* grid items default to min-width:auto, so the rail's own width was forcing
+       column 3 wider than its 1fr share and shoving the text column off centre
+       between about 1400 and 1520px. Let the column shrink; the rail can spill
+       harmlessly into the right gutter. */
+    min-width: 0;
     position: sticky;
     top: 50%;
     transform: translateY(-50%);
@@ -253,7 +248,9 @@
     font-size: var(--fs-body);
     font-weight: 400;
     color: var(--grey);
-    margin: var(--sp-label) 0 0;
+    /* a bottom margin so a bare paragraph below does not sit flush; where the
+       next block has its own top margin the two collapse and nothing changes */
+    margin: var(--sp-label) 0 var(--sp-para);
     letter-spacing: -0.005em;
   }
 
@@ -346,11 +343,7 @@
     border-radius: 0 0 5px 5px;
   }
 
-  html[data-theme="dark"] .device-base {
-    background: linear-gradient(180deg, #6e6e73 0%, #55555a 55%, #3e3e42 100%);
-  }
 
-  html[data-theme="dark"] .device-base::after { background: #4a4a4f; }
 
   /* ---- screenshot with a baked-in play icon (static, not interactive) ---- */
   .shot {
@@ -538,7 +531,8 @@
     .personas-track,
     .persona,
     .features-track,
-    .feature { transition: none !important; }
+    .feature,
+    .reveal-icon { transition: none !important; }
   }
 
   /* ---- tutor feature gallery: next slide peeks in, like the personas ---- */
@@ -573,14 +567,23 @@
     cursor: pointer;
   }
 
-  .feature .placeholder { aspect-ratio: 16 / 10; }
+  /* one fixed frame for every slide, so captures of different shapes all give the
+     same slide height. The picture is centred in it rather than stretched. */
+  .feature-shot {
+    aspect-ratio: 1774 / 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 
-  .feature img {
+  /* max-width and max-height together, never object-fit cover: cover would crop
+     the callout off the edge of the wide shots */
+  .feature-shot img {
     display: block;
-    width: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
     height: auto;
-    aspect-ratio: 16 / 10;
-    object-fit: cover;
     background: var(--panel);
     border: 1px solid var(--rule);
     border-radius: 8px;
@@ -603,11 +606,271 @@
     margin: 0;
   }
 
+  /* ---- info cards, shared by Impact and Reflection ---- */
+  .info-cards {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin: var(--sp-label) 0;
+  }
+
+  /* two across only where the two cards hold comparable amounts of text */
+  .info-cards.is-two { grid-template-columns: 1fr 1fr; }
+
+  .info-card {
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    padding: 18px;
+  }
+
+  .info-card h4 {
+    font-size: var(--fs-body);
+    font-weight: 400;
+    color: var(--ink);
+    margin: 0 0 7px;
+    letter-spacing: -0.005em;
+  }
+
+  .info-card p {
+    font-size: var(--fs-small);
+    line-height: 1.5;
+    color: var(--grey);
+    margin: 0;
+  }
+
+  .info-card p + p { margin-top: 11px; }
+
+  .info-card ul {
+    font-size: var(--fs-small);
+    line-height: 1.5;
+    color: var(--grey);
+    margin: 0;
+    padding-left: 17px;
+  }
+
+  .info-card li + li { margin-top: 6px; }
+
+  @media (max-width: 640px) {
+    .info-cards.is-two { grid-template-columns: 1fr; }
+  }
+
+  /* ---- collapsible reflection items (native details, so keyboard works free) ---- */
+  .reveal { border-bottom: 1px solid var(--rule); }
+  .reveal:last-child { border-bottom: none; }
+
+  .reveal summary {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    padding: 12px 0;
+    font-size: var(--fs-body);
+    line-height: 1.5;
+    color: var(--grey);
+    cursor: pointer;
+    list-style: none;
+    transition: color 0.2s ease;
+  }
+
+  /* hide the default disclosure triangle in every engine */
+  .reveal summary::-webkit-details-marker { display: none; }
+  .reveal summary::marker { content: ""; }
+
+  .reveal summary:hover,
+  .reveal summary:focus-visible { color: var(--ink); }
+
+  .reveal-icon {
+    flex: 0 0 auto;
+    width: 13px;
+    height: 13px;
+    margin-top: 0.2em;
+    color: var(--grey-dim);
+    transition: transform 0.2s ease;
+  }
+
+  .reveal-icon svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.6;
+  }
+
+  .reveal[open] .reveal-icon { transform: rotate(90deg); }
+
+  .reveal p {
+    margin: 0 0 14px;
+    padding-left: 23px;
+    font-size: var(--fs-body);
+    line-height: 1.6;
+    color: var(--grey);
+  }
+
+  /* ---- outcome comparison: same bar language as the rating chart ---- */
+  .result {
+    margin: var(--sp-label) 0;
+    border-top: 1px solid var(--rule);
+  }
+
+  .result-metric {
+    padding: 14px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .result-head {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 9px;
+  }
+
+  .result-name {
+    font-size: var(--fs-body);
+    color: var(--ink);
+  }
+
+  .result-delta {
+    font-size: var(--fs-small);
+    color: var(--ink);
+    background: var(--panel);
+    border-radius: 999px;
+    padding: 2px 10px;
+  }
+
+  .result-row {
+    display: grid;
+    grid-template-columns: 88px 1fr 40px;
+    align-items: center;
+    gap: 13px;
+    padding: 3px 0;
+  }
+
+  .result-who {
+    font-size: var(--fs-small);
+    color: var(--grey-dim);
+  }
+
+  .result-num {
+    font-size: var(--fs-small);
+    color: var(--ink);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* the control series stays lighter: a series colour, not a verdict */
+  .chart-fill.is-control { background: var(--grey-line); }
+
+  @media (max-width: 480px) {
+    .result-row { grid-template-columns: 74px 1fr 36px; }
+  }
+
+  /* ---- star rating: two stacked rows of five, the filled one clipped to the score ---- */
+  .stars {
+    position: relative;
+    display: inline-block;
+    /* shrink to the stars themselves: as a stretched grid item the clip
+       percentage would be measured against the whole column */
+    justify-self: start;
+    width: max-content;
+    line-height: 0;
+  }
+
+  .stars-base,
+  .stars-fill {
+    display: flex;
+    gap: 3px;
+  }
+
+  .stars-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .stars svg {
+    flex: 0 0 auto;
+    width: 15px;
+    height: 15px;
+  }
+
+  .stars-base svg {
+    fill: none;
+    stroke: var(--grey-line);
+    stroke-width: 1.6;
+  }
+
+  .stars-fill svg {
+    fill: var(--ink);
+    stroke: none;
+  }
+
+  /* ---- rating chart: built from page variables, not an embedded image ---- */
+  .chart { margin: var(--sp-label) 0; }
+
+  /* only as wide as label, stars and score need, then centred: stretching to the
+     full measure left ~290px of dead space between the stars and the number */
+  .chart-rows {
+    width: max-content;
+    max-width: 100%;
+    margin: 0 auto;
+    border-top: 1px solid var(--rule);
+  }
+
+  .chart-row {
+    display: grid;
+    grid-template-columns: 132px auto 40px;
+    align-items: center;
+    gap: 13px;
+    padding: 11px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .chart-label {
+    font-size: var(--fs-small);
+    color: var(--grey);
+  }
+
+  .chart-track {
+    position: relative;
+    height: 8px;
+    background: var(--panel);
+    border-radius: 999px;
+  }
+
+  .chart-fill {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    background: var(--ink);
+    border-radius: 999px;
+  }
+
+  .chart-value {
+    font-size: var(--fs-small);
+    color: var(--ink);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .chart figcaption { margin-top: 12px; }
+
+  @media (max-width: 480px) {
+    .chart-row {
+      grid-template-columns: 104px auto 36px;
+      gap: 10px;
+    }
+  }
+
+  /* ---- rating chart ends ---- */
+
   /* ---- wide diagram: same 814px bleed as the structure box so they align ---- */
   .diagram,
   .wide-shot {
-    width: 814px;
-    margin: var(--sp-section) calc((100% - 814px) / 2) 0;
+    width: 100%;
+    margin: var(--sp-section) 0 0;
   }
 
   .diagram a,
@@ -626,17 +889,6 @@
     background: var(--bg);
   }
 
-  /* the artwork is pure greyscale, so a straight invert is a correct dark mode */
-  html[data-theme="dark"] .diagram img { filter: invert(1); }
-
-  @media (max-width: 1100px) {
-    .diagram,
-    .wide-shot {
-      width: 100%;
-      margin-left: 0;
-      margin-right: 0;
-    }
-  }
 
   /* ---- course structure box ---- */
   .structure { margin: var(--sp-label) 0 var(--sp-section); }
@@ -836,8 +1088,8 @@
   }
 
   .screens {
-    width: min(1120px, 92vw);
-    max-height: 88vh;
+    width: min(1060px, 88vw);
+    height: min(78vh, 720px);
     padding: 0;
     background: var(--bg);
     border: 1px solid var(--rule);
@@ -890,23 +1142,116 @@
     color: var(--grey-dim);
   }
 
+  /* one screen at a time, sized to the box: nothing here should ever scroll */
   .screens-body {
+    flex: 1 1 auto;
+    min-height: 0;
     padding: 18px;
-    overflow-y: auto;
+    overflow: hidden;
   }
 
-  .screens-body figure { margin: 0 0 22px; }
-  .screens-body figure:last-child { margin-bottom: 0; }
+  .screens-page {
+    display: none;
+    height: 100%;
+    margin: 0;
+    flex-direction: column;
+  }
 
-  .screens-body img {
+  .screens-page.is-current { display: flex; }
+
+  .screens-frame {
+    position: relative;
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* half-width click targets over the picture, the usual lightbox gesture */
+  .screens-side {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 50%;
+    display: flex;
+    align-items: center;
+    padding: 0 14px;
+    background: none;
+    border: 0;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  .screens-side-prev {
+    left: 0;
+    justify-content: flex-start;
+  }
+
+  .screens-side-next {
+    right: 0;
+    justify-content: flex-end;
+  }
+
+  /* the cue only appears on the side that can actually go somewhere */
+  .screens-side:hover:not(:disabled),
+  .screens-side:focus-visible:not(:disabled) { opacity: 1; }
+  .screens-side:disabled { cursor: default; }
+
+  .screens-side span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 1px solid var(--rule);
+    color: var(--ink);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  }
+
+  .screens-side svg {
+    width: 15px;
+    height: 15px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+  }
+
+  /* max-width and max-height together let the image find its own fit, and the
+     border hugs the picture rather than an oversized box */
+  .screens-frame img {
     display: block;
-    width: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
     height: auto;
     border: 1px solid var(--rule);
     border-radius: 8px;
   }
 
-  .screens-body figcaption { text-align: left; }
+  .screens-page figcaption {
+    flex: 0 0 auto;
+    margin-top: 13px;
+    text-align: left;
+  }
+
+  .screens-nav {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-left: auto;
+  }
+
+  .screens-count {
+    font-size: var(--fs-small);
+    color: var(--grey-dim);
+    font-variant-numeric: tabular-nums;
+  }
+
+
 
   @media (max-width: 640px) {
     .modules { grid-template-columns: 1fr; }
@@ -984,7 +1329,7 @@
   }
 
   blockquote {
-    margin: var(--sp-section) 0 0;
+    margin: var(--sp-label) 0;
     padding-left: 20px;
     border-left: 1px solid var(--rule);
     font-size: var(--fs-body);
@@ -1052,7 +1397,6 @@
   footer {
     display: flex;
     align-items: center;
-    justify-content: space-between;
     max-width: 560px;
     width: 100%;
     margin: 0 auto;
@@ -1061,22 +1405,6 @@
   }
 
   .copyright { color: var(--grey-dim); }
-
-  .theme-toggle { display: flex; gap: 16px; }
-
-  .theme-btn {
-    background: none;
-    border: none;
-    padding: 0;
-    font-family: inherit;
-    font-size: inherit;
-    font-weight: 400;
-    cursor: pointer;
-    color: var(--grey-dim);
-    transition: color 0.15s ease;
-  }
-
-  .theme-btn[aria-pressed="true"] { color: var(--ink); }
 
   @media (max-width: 480px) {
     .page { padding: var(--sp-top) clamp(20px, 8vw, 40px) 0; }
@@ -1286,14 +1614,33 @@
               Back
             </button>
             <span class="screens-title">Module 01 &middot; The Journey</span>
+            <div class="screens-nav">
+              <span class="screens-count" data-screen-count>1 / 2</span>
+            </div>
           </div>
           <div class="screens-body">
-            <figure>
-              <img src="./images/module1-bank-statement.png" alt="Lesson screen 1.3, The Bank Statement. Anna asks the student to decide, row by row, whether each transaction belongs with the repair work or with their personal life.">
+            <figure class="screens-page">
+              <div class="screens-frame">
+                <button type="button" class="screens-side screens-side-prev" data-screen-prev aria-label="Previous screen">
+                  <span><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                </button>
+                <img src="./images/module1-bank-statement.png" alt="Lesson screen 1.3, The Bank Statement. Anna asks the student to decide, row by row, whether each transaction belongs with the repair work or with their personal life, with running counts of 2 repair-related, 0 personal and 16 unsorted.">
+                <button type="button" class="screens-side screens-side-next" data-screen-next aria-label="Next screen">
+                  <span><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                </button>
+              </div>
               <figcaption>1.3 &middot; Students sort real transactions into repair work or personal life, drawing the entity boundary before the term for it exists.</figcaption>
             </figure>
-            <figure>
-              <img src="./images/module1-keeping-the-reasons.png" alt="Lesson screen 1.4, Why Keep the Reasons. An assets sheet totalling 3,410 dollars, with Anna pointing out that a list of totals cannot explain how the numbers got there.">
+            <figure class="screens-page">
+              <div class="screens-frame">
+                <button type="button" class="screens-side screens-side-prev" data-screen-prev aria-label="Previous screen">
+                  <span><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                </button>
+                <img src="./images/module1-keeping-the-reasons.png" alt="Lesson screen 1.4, Why Keep the Reasons. An assets sheet totalling 3,410 dollars, with Anna pointing out that a list of totals cannot explain how the numbers got there.">
+                <button type="button" class="screens-side screens-side-next" data-screen-next aria-label="Next screen">
+                  <span><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                </button>
+              </div>
               <figcaption>1.4 &middot; The lists keep changing, and totals alone never say why. That gap is what motivates keeping the reasons, not just the balances.</figcaption>
             </figure>
           </div>
@@ -1306,14 +1653,33 @@
               Back
             </button>
             <span class="screens-title">Module 02 &middot; Getting Formal</span>
+            <div class="screens-nav">
+              <span class="screens-count" data-screen-count>1 / 2</span>
+            </div>
           </div>
           <div class="screens-body">
-            <figure>
-              <img src="./images/module2-who-sees-two.png" alt="Lesson screen 2.1, Who Sees Two? Students drag cards for their books, the bank, the credit-card company, Smith the customer, and the law into zones, deciding which of them treats the bike-repair role as separate from the rest of their life.">
+            <figure class="screens-page">
+              <div class="screens-frame">
+                <button type="button" class="screens-side screens-side-prev" data-screen-prev aria-label="Previous screen">
+                  <span><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                </button>
+                <img src="./images/module2-who-sees-two.png" alt="Lesson screen 2.1, Who Sees Two? Students drag cards for their books, the bank, the credit-card company, Smith the customer, and the law into zones, deciding which of them treats the bike-repair role as separate from the rest of their life.">
+                <button type="button" class="screens-side screens-side-next" data-screen-next aria-label="Next screen">
+                  <span><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                </button>
+              </div>
               <figcaption>2.1 &middot; Each party is tested in turn: does this one see the repair work as separate? The accounting boundary holds in the books but not in the eyes of the law.</figcaption>
             </figure>
-            <figure>
-              <img src="./images/module2-file-the-certificate.png" alt="Lesson screen 2.2, File the Certificate. Connecticut’s Certificate of Organization for the student’s bike repair LLC, with a button to file it with the state.">
+            <figure class="screens-page">
+              <div class="screens-frame">
+                <button type="button" class="screens-side screens-side-prev" data-screen-prev aria-label="Previous screen">
+                  <span><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                </button>
+                <img src="./images/module2-file-the-certificate.png" alt="Lesson screen 2.2, File the Certificate. Connecticut’s Certificate of Organization for the student’s bike repair LLC, with a button to file it with the state.">
+                <button type="button" class="screens-side screens-side-next" data-screen-next aria-label="Next screen">
+                  <span><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                </button>
+              </div>
               <figcaption>2.2 &middot; Filing the Certificate of Organization is the moment a separate legal body appears, layered onto an accounting entity that already existed.</figcaption>
             </figure>
           </div>
@@ -1326,15 +1692,34 @@
               Back
             </button>
             <span class="screens-title">Module 03 &middot; The Story Between the Snapshots</span>
+            <div class="screens-nav">
+              <span class="screens-count" data-screen-count>1 / 2</span>
+            </div>
           </div>
           <div class="screens-body">
-            <figure>
-              <img src="./images/module3-read-the-books.png" alt="Lesson screen 3.1, Read the Books. An assets sheet where every category ends in a ruled balance dated August 31, with Anna asking the student to point to a line showing where Parts stood on June 1.">
+            <figure class="screens-page">
+              <div class="screens-frame">
+                <button type="button" class="screens-side screens-side-prev" data-screen-prev aria-label="Previous screen">
+                  <span><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                </button>
+                <img src="./images/module3-read-the-books.png" alt="Lesson screen 3.1, Read the Books. An assets sheet where every category ends in a ruled balance dated August 31, with Anna asking where Parts stood on June 1, and a two-option check asking whether the June 1 balance is visible or only the August 31 balances are.">
+                <button type="button" class="screens-side screens-side-next" data-screen-next aria-label="Next screen">
+                  <span><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                </button>
+              </div>
               <figcaption>3.1 &middot; Every category ends in a balance for today, and none of them says where things stood when the season opened. That missing line is the point.</figcaption>
             </figure>
-            <figure>
-              <img src="./images/module3-what-cash-missed.png" alt="Lesson screen 3.4, What Cash Missed. A finished income statement showing 6,020 dollars of revenue against 3,380 of expenses for a net income of 2,640, followed by the question of what happened to cash over the same dates.">
-              <figcaption>3.4 &middot; The income statement closes at 2,640 dollars of net income, which raises the question the same period’s cash cannot answer on its own.</figcaption>
+            <figure class="screens-page">
+              <div class="screens-frame">
+                <button type="button" class="screens-side screens-side-prev" data-screen-prev aria-label="Previous screen">
+                  <span><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                </button>
+                <img src="./images/module3-what-cash-missed.png" alt="Lesson screen 3.4, What Cash Missed. The liabilities sheet with the credit card expanded into its individual charges, Anna explaining that the 2,030 dollar payoff settled an existing debt rather than creating an expense, and a running bridge panel starting from 2,640 dollars of net income.">
+                <button type="button" class="screens-side screens-side-next" data-screen-next aria-label="Next screen">
+                  <span><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                </button>
+              </div>
+              <figcaption>3.4 &middot; Paying off the card settles a debt from June 1 without creating an expense, which is precisely where cash and income part company.</figcaption>
             </figure>
           </div>
         </dialog>
@@ -1346,14 +1731,33 @@
               Back
             </button>
             <span class="screens-title">Module 04 &middot; The Angel Investor</span>
+            <div class="screens-nav">
+              <span class="screens-count" data-screen-count>1 / 2</span>
+            </div>
           </div>
           <div class="screens-body">
-            <figure>
-              <img src="./images/module4-laying-it-out.png" alt="Lesson screen 4.4, Laying It Out. A cash-flow statement assembled in the working tab, grouped into operating, investing and financing activities, reconciling cash from 1,300 dollars on June 1 to 620 on August 31.">
+            <figure class="screens-page">
+              <div class="screens-frame">
+                <button type="button" class="screens-side screens-side-prev" data-screen-prev aria-label="Previous screen">
+                  <span><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                </button>
+                <img src="./images/module4-laying-it-out.png" alt="Lesson screen 4.4, Laying It Out. A cash-flow statement assembled in the working tab, grouped into operating, investing and financing activities and reconciling cash from 1,300 dollars on June 1 to 620 on August 31, with a button to christen it the Cash Flow Statement.">
+                <button type="button" class="screens-side screens-side-next" data-screen-next aria-label="Next screen">
+                  <span><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                </button>
+              </div>
               <figcaption>4.4 &middot; The cash-flow statement gets grouped and totalled into operating, investing and financing, then reconciled back to the cash on hand.</figcaption>
             </figure>
-            <figure>
-              <img src="./images/module4-statements-tie-out.png" alt="Lesson screen 4.5, The Statements Tie Out. The opening and closing balance sheets sit side by side while the student picks which statement explains the 680 dollar fall in cash.">
+            <figure class="screens-page">
+              <div class="screens-frame">
+                <button type="button" class="screens-side screens-side-prev" data-screen-prev aria-label="Previous screen">
+                  <span><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                </button>
+                <img src="./images/module4-statements-tie-out.png" alt="Lesson screen 4.5, The Statements Tie Out. The opening and closing balance sheets sit side by side while the student picks which statement explains the 2,040 dollar rise in Member’s Capital.">
+                <button type="button" class="screens-side screens-side-next" data-screen-next aria-label="Next screen">
+                  <span><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                </button>
+              </div>
               <figcaption>4.5 &middot; Two balance sheets, side by side, and for each change between them the student names the statement that accounts for it.</figcaption>
             </figure>
           </div>
@@ -1426,8 +1830,9 @@
             <div class="features-viewport" data-viewport>
               <div class="features-track" data-track>
               <div class="feature" data-slide role="group" aria-roledescription="slide" aria-label="1 of 6">
-                <!-- swap this div for: <img src="./images/feature-1.png" alt="describe the screenshot"> -->
-                <div class="placeholder">Feature 1 screenshot</div>
+                <div class="feature-shot">
+                  <img src="./images/feature-1.png" alt="The Getting Started lesson page, with the rest of the screen faded back so the docked tutor stands out in the bottom right corner: an Ask Danny button with a tooltip above it reading are you stuck on this.">
+                </div>
                 <div class="feature-caption">
                   <h4>Trigger Everywhere</h4>
                   <p>Students can ask Danny a question at any point, anywhere in the course. Danny opens in a sidebar with quick-ask prompts to get them started.</p>
@@ -1435,8 +1840,9 @@
               </div>
 
               <div class="feature" data-slide role="group" aria-roledescription="slide" aria-label="2 of 6">
-                <!-- swap this div for: <img src="./images/feature-2.png" alt="describe the screenshot"> -->
-                <div class="placeholder">Feature 2 screenshot</div>
+                <div class="feature-shot">
+                  <img src="./images/feature-2.png" alt="The Sort Your Things lesson with the Danny panel open alongside it. Asked to explain the activity, Danny answers by naming that exact lesson and its Things tab, then lists what belongs there, without the student having said where they were.">
+                </div>
                 <div class="feature-caption">
                   <h4>Auto-Synced Context</h4>
                   <p>Danny already knows which lesson the student is on and whether they answered the last question correctly, so nothing has to be explained twice.</p>
@@ -1444,8 +1850,9 @@
               </div>
 
               <div class="feature" data-slide role="group" aria-roledescription="slide" aria-label="3 of 6">
-                <!-- swap this div for: <img src="./images/feature-3.png" alt="describe the screenshot"> -->
-                <div class="placeholder">Feature 3 screenshot</div>
+                <div class="feature-shot">
+                  <img src="./images/feature-3.png" alt="The Learning Progress panel for Module 1, with the rest of the screen faded back. The Line You Drew carries a warning icon and reads completed, 1 wrong, a What to revisit note names the missed question, and the highlighted Ask for Danny's Help button sits alongside it.">
+                </div>
                 <div class="feature-caption">
                   <h4>Immediate Help With Errors</h4>
                   <p>A wrong answer is marked with a button to get help on the spot. Danny&rsquo;s explanation arrives as an add-on to the activity&rsquo;s default feedback.</p>
@@ -1453,8 +1860,9 @@
               </div>
 
               <div class="feature" data-slide role="group" aria-roledescription="slide" aria-label="4 of 6">
-                <!-- swap this div for: <img src="./images/feature-4.png" alt="describe the screenshot"> -->
-                <div class="placeholder">Feature 4 screenshot</div>
+                <div class="feature-shot">
+                  <img src="./images/feature-4.png" alt="A chat exchange with Danny. The student asks how to save the chat to notes, and Danny answers with the steps: select Save as Note, which files an AI-generated summary rather than a word-for-word transcript, then carry on chatting, start a new chat, or reopen a recent one. Three suggested follow-up questions sit below.">
+                </div>
                 <div class="feature-caption">
                   <h4>Need-Based Tutorial</h4>
                   <p>Danny explains how the interface works when a student asks, one step at a time, and skips the parts the design already makes obvious.</p>
@@ -1462,8 +1870,9 @@
               </div>
 
               <div class="feature" data-slide role="group" aria-roledescription="slide" aria-label="5 of 6">
-                <!-- swap this div for: <img src="./images/feature-5.png" alt="describe the screenshot"> -->
-                <div class="placeholder">Feature 5 screenshot</div>
+                <div class="feature-shot">
+                  <img src="./images/feature-5.png" alt="A saved note titled Understanding Assets. It opens with a summary of what the session covered, tags three core concepts, lists three key learning points, and offers buttons to add it to saved notes or download the summary.">
+                </div>
                 <div class="feature-caption">
                   <h4>Save to Notes</h4>
                   <p>One click turns the conversation into a summary and files it in the student&rsquo;s notes for later review.</p>
@@ -1471,8 +1880,9 @@
               </div>
 
               <div class="feature" data-slide role="group" aria-roledescription="slide" aria-label="6 of 6">
-                <!-- swap this div for: <img src="./images/feature-6.png" alt="describe the screenshot"> -->
-                <div class="placeholder">Feature 6 screenshot</div>
+                <div class="feature-shot">
+                  <img src="./images/feature-6.png" alt="Two views of a call with Danny, stacked. Above, the call header with a running timer and an End call button, and Danny's spoken greeting shown as text. Below, Danny's avatar marked Connected, with Mute and Jump in controls.">
+                </div>
                 <div class="feature-caption">
                   <h4>Call Mode</h4>
                   <p>Students can speak to Danny and follow the transcript at the same time, and can cut in mid-response the way a real conversation works.</p>
@@ -1524,23 +1934,215 @@
 
       <section id="testing">
         <h2>Testing</h2>
-        <p>Placeholder: what was tested, with whom, and how the sessions ran.</p>
+        <p>We ran a controlled pilot with 31 participants in June 2026 to test the redesigned module and the AI tutor. Because of time constraints, the study covered only the first three tutorials of Module 1. Participants were mainly CMU students from different backgrounds and levels of prior accounting knowledge, chosen to represent the diverse backgrounds of MBA and EMBA students. Participants were randomly split into two groups: 15 used the AI tutor (Danny) and 16 did not. Both groups completed a pre-test, the tutorials, a post-test, and a feedback survey.</p>
+        <div class="result">
+          <div class="result-metric">
+            <div class="result-head">
+              <span class="result-name">Clean completion</span>
+              <span class="result-delta">12% ahead</span>
+            </div>
+            <div class="result-row">
+              <span class="result-who">With Danny</span>
+              <span class="chart-track" aria-hidden="true"><span class="chart-fill" style="width: 100.0%"></span></span>
+              <span class="result-num">70%</span>
+            </div>
+            <div class="result-row">
+              <span class="result-who">Control</span>
+              <span class="chart-track" aria-hidden="true"><span class="chart-fill is-control" style="width: 82.9%"></span></span>
+              <span class="result-num">58%</span>
+            </div>
+          </div>
+          <div class="result-metric">
+            <div class="result-head">
+              <span class="result-name">First-try correct</span>
+              <span class="result-delta">11% ahead</span>
+            </div>
+            <div class="result-row">
+              <span class="result-who">With Danny</span>
+              <span class="chart-track" aria-hidden="true"><span class="chart-fill" style="width: 100.0%"></span></span>
+              <span class="result-num">97%</span>
+            </div>
+            <div class="result-row">
+              <span class="result-who">Control</span>
+              <span class="chart-track" aria-hidden="true"><span class="chart-fill is-control" style="width: 88.7%"></span></span>
+              <span class="result-num">86%</span>
+            </div>
+          </div>
+          <div class="result-metric">
+            <div class="result-head">
+              <span class="result-name">Avg. mistakes</span>
+              <span class="result-delta">41% fewer</span>
+            </div>
+            <div class="result-row">
+              <span class="result-who">With Danny</span>
+              <span class="chart-track" aria-hidden="true"><span class="chart-fill" style="width: 59.1%"></span></span>
+              <span class="result-num">3.9</span>
+            </div>
+            <div class="result-row">
+              <span class="result-who">Control</span>
+              <span class="chart-track" aria-hidden="true"><span class="chart-fill is-control" style="width: 100.0%"></span></span>
+              <span class="result-num">6.6</span>
+            </div>
+          </div>
+        </div>
+
+        <p>In that survey, the 15 who worked with the tutor rated the instructional content across five dimensions on a 1 to 5 scale.</p>
+        <figure class="chart">
+          <div class="chart-rows">
+            <div class="chart-row">
+              <span class="chart-label">Overall Experience</span>
+              <span class="stars" aria-hidden="true">
+                <span class="stars-base">
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                </span>
+                <span class="stars-fill" style="width: 93.33%">
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                </span>
+              </span>
+              <span class="chart-value">4.67</span>
+            </div>
+            <div class="chart-row">
+              <span class="chart-label">Clarity</span>
+              <span class="stars" aria-hidden="true">
+                <span class="stars-base">
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                </span>
+                <span class="stars-fill" style="width: 94.67%">
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                </span>
+              </span>
+              <span class="chart-value">4.73</span>
+            </div>
+            <div class="chart-row">
+              <span class="chart-label">Usefulness</span>
+              <span class="stars" aria-hidden="true">
+                <span class="stars-base">
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                </span>
+                <span class="stars-fill" style="width: 92.0%">
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                </span>
+              </span>
+              <span class="chart-value">4.60</span>
+            </div>
+            <div class="chart-row">
+              <span class="chart-label">Confidence</span>
+              <span class="stars" aria-hidden="true">
+                <span class="stars-base">
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                </span>
+                <span class="stars-fill" style="width: 85.33%">
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                </span>
+              </span>
+              <span class="chart-value">4.27</span>
+            </div>
+            <div class="chart-row">
+              <span class="chart-label">Engagement</span>
+              <span class="stars" aria-hidden="true">
+                <span class="stars-base">
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                </span>
+                <span class="stars-fill" style="width: 92.0%">
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                </span>
+              </span>
+              <span class="chart-value">4.60</span>
+            </div>
+          </div>
+          <figcaption>Post-survey ratings from the AI tutor group, mean of 15 responses on a 1 to 5 scale.</figcaption>
+        </figure>
+
+        <blockquote>
+          The way this module is set up makes accounting seem less scary. It&rsquo;s kind of like storytelling. Not the usual way to study accounting, but it was really easy to follow along and kept me engaged.
+          <cite>Pilot participant, novice learner</cite>
+        </blockquote>
       </section>
 
 
       <section id="impact">
         <h2>Impact</h2>
-        <p>We ran a pilot with 31 participants, comparing learners who had tutor access against those working through the same modules without it, with knowledge tests before and after.</p>
-        <p>The clearest finding wasn't about scores. Learners with the tutor asked questions they wouldn't have asked a person, including the ones they thought were too basic to admit to.</p>
-        <blockquote>
-          I'd never ask a professor something this obvious. I asked it four times.
-          <cite>Pilot participant</cite>
-        </blockquote>
+        <p>Where the original course was built more than a decade ago for a narrower audience, the redesigned pre-work frames accounting the way today's MBA and EMBA students will actually use it: as decision-makers who interpret financial information rather than produce it. The work goes to the Dean of the Yale School of Management and to CMU's Tepper School of Business, with the course due to launch for Yale students next year and to inform how accounting courses are developed at Tepper.</p>
+
+        <div class="info-cards is-two">
+          <div class="info-card">
+            <h4>For learners</h4>
+            <p>Instead of passive videos explaining numbers and equations, the pre-work introduces every concept through a tangible, story-driven scenario. Learners from any background can follow the reasoning and reach core ideas like the accounting identity as a conclusion rather than a formula to memorize.</p>
+          </div>
+          <div class="info-card">
+            <h4>For teaching</h4>
+            <p>Because every activity and tutor conversation is captured in a shared database, instructors can see how students actually move through the material: where they hesitate, what they get wrong, and which concepts they bring to the tutor. Rather than a one-off deliverable, they get a working model they can develop further, with learning data to iterate against.</p>
+          </div>
+        </div>
       </section>
 
       <section id="reflection">
         <h2>Reflection</h2>
-        <p>We scoped the tutor before we finished testing the course, which meant some of its behavior was designed around modules that later changed. Sequencing the research earlier would have saved a round of rework.</p>
+
+        <div class="info-cards">
+          <div class="info-card">
+            <h4>What I learned</h4>
+            <details class="reveal">
+              <summary><span class="reveal-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Collaborating across a team of different roles.</summary>
+              <p>Research, design, and development each read the same finding differently, so a result that looked settled to me still had to be restated in the terms the next person worked in. Communicating a decision turned out to be as much of the job as reaching one.</p>
+            </details>
+            <details class="reveal">
+              <summary><span class="reveal-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Using testing results to argue for a design.</summary>
+              <p>It is easy to defend a choice with how we assume people will use something. The pilot gave firmer ground: the survey named the fix learners asked for most, and the learner study showed which explanations novices actually wanted. Pointing at that evidence settled disagreements faster than intuition did.</p>
+            </details>
+          </div>
+          <div class="info-card">
+            <h4>What I would improve</h4>
+            <details class="reveal">
+              <summary><span class="reveal-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Involve learners more directly in the design process.</summary>
+              <p>Most of the design conversation happened between the professors and our development team. We did substantial research with current students early on, but that research informed the design from the outside rather than having students help shape it. Bringing them into the design process itself, not only as research subjects, is something we would do more of next time.</p>
+            </details>
+            <details class="reveal">
+              <summary><span class="reveal-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Test for longer, with real usage over time.</summary>
+              <p>Because of the time available for testing sessions, our pilot covered only the first three tutorials of Module 1. Given a longer timeframe we would test across a wider stretch of the course and iterate on how students actually use it, rather than relying on a single session.</p>
+            </details>
+          </div>
+        </div>
       </section>
 
       <nav class="pager" aria-label="More work">
@@ -1584,31 +2186,9 @@
 
   <footer>
     <span class="copyright">© 2026</span>
-    <div class="theme-toggle">
-      <button class="theme-btn" id="btn-light" aria-pressed="true">Light</button>
-      <button class="theme-btn" id="btn-dark" aria-pressed="false">Dark</button>
-    </div>
   </footer>
 
   <script>
-    /* theme toggle */
-    const root = document.documentElement;
-    const btnLight = document.getElementById('btn-light');
-    const btnDark = document.getElementById('btn-dark');
-
-    function setTheme(theme) {
-      root.setAttribute('data-theme', theme);
-      btnLight.setAttribute('aria-pressed', theme === 'light');
-      btnDark.setAttribute('aria-pressed', theme === 'dark');
-    }
-
-    btnLight.addEventListener('click', () => setTheme('light'));
-    btnDark.addEventListener('click', () => setTheme('dark'));
-
-    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      setTheme('dark');
-    }
-
     /* section rail: highlight whichever section is currently in view */
     const tocLinks = Array.from(document.querySelectorAll('.toc a'));
     const sections = tocLinks
@@ -1644,9 +2224,43 @@
       const dialog = document.getElementById(trigger.dataset.openScreens);
       if (!dialog) return;
 
+      const pages = [...dialog.querySelectorAll('.screens-page')];
+      const count = dialog.querySelector('[data-screen-count]');
+      const stepPrev = [...dialog.querySelectorAll('[data-screen-prev]')];
+      const stepNext = [...dialog.querySelectorAll('[data-screen-next]')];
+      let page = 0;
+
+      function showPage(i) {
+        const wasFocused = document.activeElement;
+        page = Math.max(0, Math.min(i, pages.length - 1));
+        pages.forEach((el, n) => el.classList.toggle('is-current', n === page));
+        if (count) count.textContent = (page + 1) + ' / ' + pages.length;
+        stepPrev.forEach(b => { b.disabled = page === 0; });
+        stepNext.forEach(b => { b.disabled = page === pages.length - 1; });
+
+        /* paging to an end disables the control you just used, and the browser
+           then drops focus to <body>, outside the dialog. Catch it and hand
+           focus to whatever is still live. */
+        if (wasFocused && wasFocused.disabled) {
+          const live = [...stepPrev, ...stepNext].find(b => !b.disabled && b.offsetParent);
+          (live || dialog.querySelector('[data-close-screens]')).focus();
+        }
+      }
+
+      stepPrev.forEach(b => b.addEventListener('click', () => showPage(page - 1)));
+      stepNext.forEach(b => b.addEventListener('click', () => showPage(page + 1)));
+
+      /* bound to the document, not the dialog: a click can leave focus outside
+         the dialog, and a listener on the dialog would then never fire */
+      document.addEventListener('keydown', e => {
+        if (!dialog.open) return;
+        if (e.key === 'ArrowRight') { e.preventDefault(); showPage(page + 1); }
+        if (e.key === 'ArrowLeft') { e.preventDefault(); showPage(page - 1); }
+      });
+
       trigger.addEventListener('click', () => {
+        showPage(0);
         dialog.showModal();
-        dialog.querySelector('.screens-body').scrollTop = 0;
       });
 
       dialog.querySelectorAll('[data-close-screens]').forEach(btn => {
