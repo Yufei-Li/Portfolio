@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI-Assisted Accounting Introduction Pedagogy Design | Yufei Li</title>
+<title>AI 辅助会计入门教学法设计 | 李宇飞</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500&family=Inter:wght@400;500&display=swap" rel="stylesheet">
@@ -49,7 +49,7 @@
     flex-direction: column;
     background: var(--bg);
     color: var(--ink);
-    font-family: 'Geist', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    font-family: 'Geist', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', Roboto, Helvetica, Arial, sans-serif;
     font-weight: 400;
     transition: background 0.3s ease, color 0.3s ease;
   }
@@ -211,12 +211,6 @@
     color: var(--ink);
   }
 
-  .client {
-    font-size: var(--fs-body);
-    color: var(--grey);
-    margin: 0 0 var(--sp-intro);
-  }
-
   .meta {
     display: flex;
     flex-wrap: wrap;
@@ -253,6 +247,11 @@
     margin: var(--sp-label) 0 var(--sp-para);
     letter-spacing: -0.005em;
   }
+
+  /* a subheading that follows a previous subsection needs section-scale air
+     above it; directly under its own h2 the label-scale gap is right */
+  * + h3 { margin-top: var(--sp-section); }
+  h2 + h3 { margin-top: var(--sp-label); }
 
   p {
     font-size: var(--fs-body);
@@ -606,6 +605,60 @@
     margin: 0;
   }
 
+  /* ---- hero deck and headline results, for the reader who gives it 5 seconds ---- */
+  /* the client name sits on its own line, without needing a <br> */
+  .deck strong {
+    display: block;
+    margin-bottom: 5px;
+  }
+
+  .deck {
+    font-size: var(--fs-heading);
+    line-height: 1.4;
+    font-weight: 400;
+    color: var(--grey);
+    letter-spacing: -0.005em;
+    margin: 0 0 var(--sp-intro);
+  }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    padding: var(--sp-label) 0;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: var(--sp-intro);
+  }
+
+  .stat-n {
+    display: block;
+    font-size: var(--fs-heading);
+    line-height: 1.2;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+
+  .stat-l {
+    display: block;
+    margin-top: 3px;
+    font-size: var(--fs-small);
+    line-height: 1.4;
+    color: var(--grey);
+  }
+
+  @media (max-width: 520px) {
+    .stats { grid-template-columns: 1fr; gap: 11px; }
+  }
+
+  /* a section-level disclosure: the detail is kept, just not in the default read */
+  .reveal-block {
+    border-top: 1px solid var(--rule);
+    margin-top: var(--sp-label);
+  }
+
+  .reveal.reveal-block:last-child { border-bottom: 1px solid var(--rule); }
+
   /* ---- info cards, shared by Impact and Reflection ---- */
   .info-cards {
     display: grid;
@@ -867,19 +920,16 @@
   /* ---- rating chart ends ---- */
 
   /* ---- wide diagram: same 814px bleed as the structure box so they align ---- */
-  .diagram,
   .wide-shot {
     width: 100%;
     margin: var(--sp-section) 0 0;
   }
 
-  .diagram a,
   .wide-shot a {
     display: block;
     line-height: 0;
   }
 
-  .diagram img,
   .wide-shot img {
     display: block;
     width: 100%;
@@ -1146,18 +1196,33 @@
   .screens-body {
     flex: 1 1 auto;
     min-height: 0;
+    display: flex;
+    flex-direction: column;
     padding: 18px;
     overflow: hidden;
   }
 
+  .screens-intro {
+    flex: 0 0 auto;
+    margin: 0 0 14px;
+    font-size: var(--fs-small);
+    line-height: 1.5;
+    color: var(--grey);
+  }
+
   .screens-page {
     display: none;
-    height: 100%;
     margin: 0;
     flex-direction: column;
   }
 
-  .screens-page.is-current { display: flex; }
+  /* flex rather than height:100%, so the intro line above it takes its share
+     and the picture shrinks to fit instead of forcing a scrollbar */
+  .screens-page.is-current {
+    display: flex;
+    flex: 1 1 auto;
+    min-height: 0;
+  }
 
   .screens-frame {
     position: relative;
@@ -1260,7 +1325,7 @@
   /* ---- insight -> response table, held to the body measure ---- */
   .mapping {
     width: 100%;
-    margin: var(--sp-label) 0 0;
+    margin: 0 0 var(--sp-label);
     border-collapse: collapse;
     table-layout: fixed;
   }
@@ -1395,14 +1460,15 @@
   }
 
   footer {
-    display: flex;
-    align-items: center;
-    max-width: 560px;
-    width: 100%;
-    margin: 0 auto;
-    padding: 16px var(--gutter) 24px;
-    font-size: var(--fs-footer);
-  }
+  display: flex;
+  align-items: center;
+  justify-content: center;   /* ← add this */
+  max-width: 560px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 16px var(--gutter) 24px;
+  font-size: var(--fs-footer);
+}
 
   .copyright { color: var(--grey-dim); }
 
@@ -1415,7 +1481,7 @@
 <body>
   <div class="page">
     <div class="content">
-      <a class="mark-link" href="index.html" aria-label="Back to home">
+      <a class="mark-link" href="index-cn.html" aria-label="返回首页">
         <span class="mark-ball">
           <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
             <circle cx="20" cy="20" r="19" fill="var(--tennis)"/>
@@ -1434,86 +1500,86 @@
             </g>
           </svg>
         </span>
-        <span class="mark-label">Back</span>
+        <span class="mark-label">返回</span>
       </a>
 
-      <h1>AI-Assisted Accounting Introduction Pedagogy Design</h1>
-      <p class="client">Yale School of Management</p>
+      <h1>AI 辅助会计入门教学法设计</h1>
+      <p class="deck"><strong>耶鲁大学管理学院。</strong> 围绕一个商业场景和一位 AI 导师重建了会计先修课程，让学生通过真实场景理解概念，而非死记硬背。</p>
+
+      <div class="stats">
+        <div><span class="stat-n">41%</span><span class="stat-l">使用导师后错误减少</span></div>
+        <div><span class="stat-n">350+</span><span class="stat-l">课程上线后每年服务学生数</span></div>
+      </div>
 
       <figure>
         <div class="device">
           <div class="device-screen">
-            <img src="./images/course-overview.png" alt="The course site open in a browser: the Laying It Out lesson on the left, building a cash-flow statement in a spreadsheet, with the Danny AI tutor panel docked on the right offering quick-ask questions.">
+            <img src="./images/course-overview.png" alt="在浏览器中打开的课程网站：左侧是“布局”课程，在电子表格中构建现金流量表，右侧停靠着 Danny AI 导师面板，提供快速提问。">
           </div>
           <div class="device-base"></div>
         </div>
-        <figcaption>The redesigned course, with Danny the AI tutor alongside each lesson.</figcaption>
+        <figcaption>重新设计的课程截图，每节课旁都有 AI 导师 Danny。</figcaption>
       </figure>
 
       <div class="meta">
-        <div><span class="k">Role</span><span class="v">Research Lead</span></div>
-        <div><span class="k">Timeline</span><span class="v">January to July 2026</span></div>
+        <div><span class="k">角色</span><span class="v">学习工程师 - 研究负责人</span></div>
+        <div><span class="k">时间</span><span class="v">2026 年 1 月至 7 月</span></div>
       </div>
 
       <section id="overview">
-        <h2>Overview</h2>
-        <p>Yale's accounting pre-work course prepares 350+ incoming MBA and EMBA students each year before they begin their core coursework. The course was developed more than a decade ago, so its materials need to be updated to better reflect what MBA students actually need.</p>
-        <p>Our team redesigned the course content with an AI tutor. I led the research: user studies, literature review, and rounds of testing that fed each iteration and kept design decisions tied to what learners actually did rather than what we assumed.</p>
+        <h2>概述</h2>
+        <p>耶鲁的会计先修课程每年为 350+ 名即将入学的 MBA 和 EMBA 学生在开始核心课程前做好准备。我们的团队重新设计了课程内容并开发了一位 AI 导师。我负责研究：用户研究、文献综述，以及推动每次迭代的测试轮次，确保设计决策与学习者的实际行为挂钩，而非我们的假设。</p>
       </section>
 
       <section id="problem">
-        <h2>Problem</h2>
-        <p>This project was initiated to address two concerns. First, the professor sought to modernize the curriculum, shifting away from conventional bookkeeping instruction to focus instead on helping senior business leaders interpret financial statements for strategic decision-making.</p>
-        <p>Second, as AI capabilities rapidly advance, the project aimed to guide students in leveraging AI tools effectively throughout the course while actively minimizing AI misinterpretations and potential misuse.</p>
-      </section>
+        <h2>问题</h2>
+        <p>项目始于两个担忧：课程仍围绕传统会计学习的体系构建，以及学生不当地 AI 可能会减弱学习效果。</p>
 
       <figure>
         <div class="shot">
-          <img src="./images/course-before.png" alt="The original Yale accounting pre-work course on Canvas, with a lecture video embedded in the page.">
+          <img src="./images/course-before.png" alt="Canvas 上的原始耶鲁会计先修课程，页面中嵌入了讲座视频。">
         </div>
-        <figcaption>The original course is presented on Canvas, instructed by texts and videos.</figcaption>
+        <figcaption>原始课程在 Canvas 上呈现，通过文本和视频授课。</figcaption>
       </figure>
 
-      <section id="user-study">
-        <h2>User Study</h2>
-        <p>The user study combined post-course survey analysis of 1,279 respondents and interviews with two past learners to define who we are designing for and what improvements the current course needs.</p>
+        <p>用户研究结合了对 1,279 名受访者的课后调查分析，以及对两位往届学生的访谈，以确定我们为谁设计，以及当前课程需要哪些改进。</p>
 
-        <h3>Who We Designed For</h3>
-        <div class="personas" data-gallery="persona" role="group" aria-roledescription="carousel" aria-label="Personas">
+        <div class="personas" data-gallery="persona" role="group" aria-roledescription="carousel" aria-label="用户画像">
           <div class="gal-stage">
             <div class="personas-viewport" data-viewport>
               <div class="personas-track" data-track>
-              <div class="persona" data-slide role="group" aria-roledescription="slide" aria-label="1 of 2">
-                <h4>Accounting Novice</h4>
-                <p class="note">Composite, grounded in our student interview</p>
+              <div class="persona" data-slide role="group" aria-roledescription="slide" aria-label="第 1 个，共 2 个">
+                <h4>会计新手</h4>
+                <p class="note">综合画像，基于我们的用户研究</p>
                 <div class="tags">
                   <span>MBA</span>
-                  <span>No accounting background</span>
-                  <span>Studies at night</span>
+                  <span>无会计背景</span>
+                  <span>夜间学习</span>
                 </div>
-                <p><span class="k">Goals</span>Learn accounting from zero and keep momentum while studying at night.</p>
-                <p><span class="k">Pain Points</span>Course feedback marks answers wrong without ever explaining why.</p>
-                <p class="quote">&ldquo;I want feedback that tells me why, not just if I&rsquo;m right.&rdquo;</p>
+                <p><span class="k">目标</span>从零开始学习会计，并在夜间学习时保持动力。</p>
+                <p><span class="k">痛点</span>课程反馈只标记答案错误，从不解释原因。</p>
+                <p class="quote">&ldquo;我希望反馈能告诉我为什么，而不仅仅是对不对。&rdquo;</p>
               </div>
 
-              <div class="persona" data-slide role="group" aria-roledescription="slide" aria-label="2 of 2">
-                <h4>Business Veteran</h4>
-                <p class="note">Composite, grounded in our student interview</p>
+              <div class="persona" data-slide role="group" aria-roledescription="slide" aria-label="第 2 个，共 2 个">
+                <h4>商界老手</h4>
+                <p class="note">综合画像，基于我们的用户研究</p>
                 <div class="tags">
                   <span>EMBA</span>
-                  <span>Patchy recall</span>
-                  <span>Studies between work</span>
+                  <span>记忆零散</span>
+                  <span>工作间隙学习</span>
                 </div>
-                <p><span class="k">Goals</span>Refresh the right concepts fast, with help that knows where he stands.</p>
-                <p><span class="k">Pain Points</span>No quick way to spot which fundamentals have quietly rusted.</p>
-                <p class="quote">&ldquo;AI could remind me about the marginal concepts, when a professor isn&rsquo;t easily accessible online.&rdquo;</p>
+                <p><span class="k">目标</span>快速复习正确的概念，需要知道他的掌握情况的帮助。</p>
+                <p><span class="k">痛点</span>没有快速方法找出哪些基础知识已经悄然生疏。</p>
+                <p class="quote">&ldquo;当教授不方便在线解答时，AI 可以提醒我那些边缘概念。&rdquo;</p>
+              </div>
               </div>
             </div>
 
-            <button type="button" class="gal-arrow gal-arrow-prev" data-prev aria-label="Previous persona">
+            <button type="button" class="gal-arrow gal-arrow-prev" data-prev aria-label="上一位用户画像">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </button>
-            <button type="button" class="gal-arrow gal-arrow-next" data-next aria-label="Next persona">
+            <button type="button" class="gal-arrow gal-arrow-next" data-next aria-label="下一位用户画像">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </button>
           </div>
@@ -1523,262 +1589,265 @@
           </div>
         </div>
 
-        <h3>From Frustration to Fix</h3>
-        <table class="mapping">
-          <colgroup>
-            <col class="c-frustration">
-            <col class="c-response">
-          </colgroup>
-          <thead>
-            <tr>
-              <th scope="col">Frustrations</th>
-              <th scope="col">Design Response</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td data-label="Frustrations">Both interviewees named the same problem: concepts that quietly stay broken.</td>
-              <td data-label="Design Response">Practice checkpoints run throughout the course, feeding a misconception model the AI tutor keeps for each student.</td>
-            </tr>
-            <tr>
-              <td data-label="Frustrations">The top requested fix in the survey: explain why my answer was wrong.</td>
-              <td data-label="Design Response">The AI tutor reads the question context alongside the student's answer, then explains the gap in the same terms the module used.</td>
-            </tr>
-            <tr>
-              <td data-label="Frustrations">Students pick up the terms without seeing how the statements connect.</td>
-              <td data-label="Design Response">Each concept arrives inside a scenario, showing where the number comes from and what decision it informs.</td>
-            </tr>
-          </tbody>
-        </table>
+        <details class="reveal reveal-block">
+          <summary><span class="reveal-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>将研究中的挫败点映射到设计解决方案</summary>
+          <table class="mapping">
+            <colgroup>
+              <col class="c-frustration">
+              <col class="c-response">
+            </colgroup>
+            <thead>
+              <tr>
+                <th scope="col">挫败点</th>
+                <th scope="col">设计响应</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td data-label="挫败点">两位受访者都提到了同一个问题：概念悄然保持错误。</td>
+                <td data-label="设计响应">测验贯穿整个课程，并且 AI 导师根据测验建立每位学生的误解模型。</td>
+              </tr>
+              <tr>
+                <td data-label="挫败点">调查中呼声最高的改进：解释我的答案为什么错了。</td>
+                <td data-label="设计响应">AI 导师结合问题语境和学生的答案，用模块中相同的术语解释错误原因。</td>
+              </tr>
+              <tr>
+                <td data-label="挫败点">学生记住了术语，却看不到报表之间如何关联。</td>
+                <td data-label="设计响应">每个报表与概念都在真实场景中呈现，展示数字从何而来，以及它支持什么决策。</td>
+              </tr>
+            </tbody>
+          </table>
+        </details>
       </section>
 
-      <section id="instructional-design">
-        <h2>Instructional Design</h2>
+      <section id="solution">
+        <h2>解决方案</h2>
+        <h3>教学设计</h3>
         <figure class="structure">
           <div class="structure-box">
-            <span class="structure-phase">Discovery</span>
+            <span class="structure-phase">发现</span>
             <div class="modules">
               <button type="button" class="module module-open" data-open-screens="module-1-screens" aria-haspopup="dialog">
                 <span class="module-n">01</span>
-                <h4>The Journey</h4>
-                <p>Begins with a bike-repair job still tangled up in personal life. Sorting through the records draws a boundary around the repair work, and it starts to be treated as an accounting entity.</p>
-                <span class="module-cue">View the lesson screens
+                <h4>旅程</h4>
+                <span class="module-cue">查看课程截图
                   <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </span>
               </button>
               <button type="button" class="module module-open" data-open-screens="module-2-screens" aria-haspopup="dialog">
                 <span class="module-n">02</span>
-                <h4>Getting Formal</h4>
-                <p>Formalizes the repair work as a business by establishing an LLC, adding a separate legal body to an accounting entity that already exists.</p>
-                <span class="module-cue">View the lesson screens
+                <h4>正式化</h4>
+                <span class="module-cue">查看课程截图
                   <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </span>
               </button>
               <button type="button" class="module module-open" data-open-screens="module-3-screens" aria-haspopup="dialog">
                 <span class="module-n">03</span>
-                <h4>The Story Between the Snapshots</h4>
-                <p>Turns to how detailed records are organized to explain a business's financial performance across a chosen period of time.</p>
-                <span class="module-cue">View the lesson screens
+                <h4>快照之间的故事</h4>
+                <span class="module-cue">查看课程截图
                   <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </span>
               </button>
               <button type="button" class="module module-open" data-open-screens="module-4-screens" aria-haspopup="dialog">
                 <span class="module-n">04</span>
-                <h4>The Angel Investor</h4>
-                <p>Draws the earlier concepts together, showing how the financial statements connect into a comprehensive view of a business's financial health.</p>
-                <span class="module-cue">View the lesson screens
+                <h4>天使投资人</h4>
+                <span class="module-cue">查看课程截图
                   <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </span>
               </button>
             </div>
-            <span class="structure-phase">Transfer</span>
+            <span class="structure-phase">迁移</span>
             <div class="modules">
               <div class="module">
-                <span class="module-n">05 (Coming Soon)</span>
-                <h4>Real Statements</h4>
-                <p>Presents CVS Health's two balance sheets, then traces how each explanatory statement accounts for one part of the change between them: cash, equities, and where net income comes from.</p>
+                <span class="module-n">05（即将推出）</span>
+                <h4>真实报表</h4>
               </div>
               <div class="module">
-                <span class="module-n">06 (Coming Soon)</span>
-                <h4>Nonprofit Statements</h4>
-                <p>Moves to a nonprofit, Yale's own Statement of Financial Position, following what donor restrictions bind and what releases them, and how the Statement of Activities accounts for the change in Net Assets.</p>
+                <span class="module-n">06（即将推出）</span>
+                <h4>非营利组织报表</h4>
               </div>
             </div>
           </div>
-          <figcaption>Redesigned course structure</figcaption>
+          <figcaption>重新设计的课程结构</figcaption>
         </figure>
-        <dialog class="screens" id="module-1-screens" aria-label="Module 1 lesson screens">
+        <dialog class="screens" id="module-1-screens" aria-label="模块 1 课程屏幕">
           <div class="screens-bar">
             <button type="button" class="screens-back" data-close-screens>
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              Back
+              返回
             </button>
-            <span class="screens-title">Module 01 &middot; The Journey</span>
+            <span class="screens-title">模块 01 &middot; 旅程</span>
             <div class="screens-nav">
               <span class="screens-count" data-screen-count>1 / 2</span>
             </div>
           </div>
           <div class="screens-body">
+            <p class="screens-intro">从一项与个人生活纠缠不清的自行车维修业务开始。梳理记录时，学生需要划出维修工作的边界，自行车维修业务开始被视为一个会计主体。</p>
             <figure class="screens-page">
               <div class="screens-frame">
-                <button type="button" class="screens-side screens-side-prev" data-screen-prev aria-label="Previous screen">
+                <button type="button" class="screens-side screens-side-prev" data-screen-prev aria-label="上一屏">
                   <span><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
                 </button>
-                <img src="./images/module1-bank-statement.png" alt="Lesson screen 1.3, The Bank Statement. Anna asks the student to decide, row by row, whether each transaction belongs with the repair work or with their personal life, with running counts of 2 repair-related, 0 personal and 16 unsorted.">
-                <button type="button" class="screens-side screens-side-next" data-screen-next aria-label="Next screen">
+                <img src="./images/module1-bank-statement.png" alt="课程屏幕 1.3，银行对账单。Anna 让学生逐行决定每笔交易属于维修工作还是个人生活，并显示维修相关 2 笔、个人 0 笔、未分类 16 笔的计数。">
+                <button type="button" class="screens-side screens-side-next" data-screen-next aria-label="下一屏">
                   <span><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
                 </button>
               </div>
-              <figcaption>1.3 &middot; Students sort real transactions into repair work or personal life, drawing the entity boundary before the term for it exists.</figcaption>
+              <figcaption>1.3 &middot; 活动1.3: 学生将交易流水分类为维修工作或个人生活，在术语出现之前划出主体边界。</figcaption>
             </figure>
             <figure class="screens-page">
               <div class="screens-frame">
-                <button type="button" class="screens-side screens-side-prev" data-screen-prev aria-label="Previous screen">
+                <button type="button" class="screens-side screens-side-prev" data-screen-prev aria-label="上一屏">
                   <span><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
                 </button>
-                <img src="./images/module1-keeping-the-reasons.png" alt="Lesson screen 1.4, Why Keep the Reasons. An assets sheet totalling 3,410 dollars, with Anna pointing out that a list of totals cannot explain how the numbers got there.">
-                <button type="button" class="screens-side screens-side-next" data-screen-next aria-label="Next screen">
+                <img src="./images/module1-keeping-the-reasons.png" alt="课程屏幕 1.4，为什么要保留原因。一张总计 3,410 美元的资产表，Anna 指出一列总数无法解释数字是如何得来的。">
+                <button type="button" class="screens-side screens-side-next" data-screen-next aria-label="下一屏">
                   <span><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
                 </button>
               </div>
-              <figcaption>1.4 &middot; The lists keep changing, and totals alone never say why. That gap is what motivates keeping the reasons, not just the balances.</figcaption>
+              <figcaption>1.4 &middot; 账单不断变化，学生发现仅凭余额永远无法正确评估公司表现。</figcaption>
             </figure>
           </div>
         </dialog>
 
-        <dialog class="screens" id="module-2-screens" aria-label="Module 2 lesson screens">
+        <dialog class="screens" id="module-2-screens" aria-label="模块 2 课程屏幕">
           <div class="screens-bar">
             <button type="button" class="screens-back" data-close-screens>
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              Back
+              返回
             </button>
-            <span class="screens-title">Module 02 &middot; Getting Formal</span>
+            <span class="screens-title">模块 02 &middot; 正式化</span>
             <div class="screens-nav">
               <span class="screens-count" data-screen-count>1 / 2</span>
             </div>
           </div>
           <div class="screens-body">
+            <p class="screens-intro">通过成立 LLC 将维修工作正式化为企业，为已经存在的会计主体增加一个独立的法律主体。</p>
             <figure class="screens-page">
               <div class="screens-frame">
-                <button type="button" class="screens-side screens-side-prev" data-screen-prev aria-label="Previous screen">
+                <button type="button" class="screens-side screens-side-prev" data-screen-prev aria-label="上一屏">
                   <span><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
                 </button>
-                <img src="./images/module2-who-sees-two.png" alt="Lesson screen 2.1, Who Sees Two? Students drag cards for their books, the bank, the credit-card company, Smith the customer, and the law into zones, deciding which of them treats the bike-repair role as separate from the rest of their life.">
-                <button type="button" class="screens-side screens-side-next" data-screen-next aria-label="Next screen">
+                <img src="./images/module2-who-sees-two.png" alt="课程屏幕 2.1，谁看到两个？学生将代表自己的账簿、银行、信用卡公司、客户 Smith 和法律的卡片拖入区域，决定其中哪些将自行车维修角色视为与生活其余部分分离。">
+                <button type="button" class="screens-side screens-side-next" data-screen-next aria-label="下一屏">
                   <span><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
                 </button>
               </div>
-              <figcaption>2.1 &middot; Each party is tested in turn: does this one see the repair work as separate? The accounting boundary holds in the books but not in the eyes of the law.</figcaption>
+              <figcaption>2.1 &middot; 各方逐一接受检验：这一方是否将维修工作视为独立？会计边界在账簿中成立，但在法律眼中不成立。</figcaption>
             </figure>
             <figure class="screens-page">
               <div class="screens-frame">
-                <button type="button" class="screens-side screens-side-prev" data-screen-prev aria-label="Previous screen">
+                <button type="button" class="screens-side screens-side-prev" data-screen-prev aria-label="上一屏">
                   <span><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
                 </button>
-                <img src="./images/module2-file-the-certificate.png" alt="Lesson screen 2.2, File the Certificate. Connecticut’s Certificate of Organization for the student’s bike repair LLC, with a button to file it with the state.">
-                <button type="button" class="screens-side screens-side-next" data-screen-next aria-label="Next screen">
+                <img src="./images/module2-file-the-certificate.png" alt="课程屏幕 2.2，提交证书。康涅狄格州为学生自行车维修 LLC 颁发的组织证书，附有一个向州政府提交的按钮。">
+                <button type="button" class="screens-side screens-side-next" data-screen-next aria-label="下一屏">
                   <span><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
                 </button>
               </div>
-              <figcaption>2.2 &middot; Filing the Certificate of Organization is the moment a separate legal body appears, layered onto an accounting entity that already existed.</figcaption>
+              <figcaption>2.2 &middot; 提交组织证书的那一刻，一个独立的法律主体出现，叠加在已经存在的会计主体之上。</figcaption>
             </figure>
           </div>
         </dialog>
 
-        <dialog class="screens" id="module-3-screens" aria-label="Module 3 lesson screens">
+        <dialog class="screens" id="module-3-screens" aria-label="模块 3 课程屏幕">
           <div class="screens-bar">
             <button type="button" class="screens-back" data-close-screens>
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              Back
+              返回
             </button>
-            <span class="screens-title">Module 03 &middot; The Story Between the Snapshots</span>
+            <span class="screens-title">模块 03 &middot; 账本之间的故事</span>
             <div class="screens-nav">
               <span class="screens-count" data-screen-count>1 / 2</span>
             </div>
           </div>
           <div class="screens-body">
+            <p class="screens-intro">转向如何组织详细记录，以解释企业在选定期间内的财务表现。</p>
             <figure class="screens-page">
               <div class="screens-frame">
-                <button type="button" class="screens-side screens-side-prev" data-screen-prev aria-label="Previous screen">
+                <button type="button" class="screens-side screens-side-prev" data-screen-prev aria-label="上一屏">
                   <span><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
                 </button>
-                <img src="./images/module3-read-the-books.png" alt="Lesson screen 3.1, Read the Books. An assets sheet where every category ends in a ruled balance dated August 31, with Anna asking where Parts stood on June 1, and a two-option check asking whether the June 1 balance is visible or only the August 31 balances are.">
-                <button type="button" class="screens-side screens-side-next" data-screen-next aria-label="Next screen">
+                <img src="./images/module3-read-the-books.png" alt="课程屏幕 3.1，阅读账簿。一张资产表，每个类别都以 8 月 31 日的余额结尾，Anna 询问 6 月 1 日零件余额是多少，并附有一个两项检查，询问 6 月 1 日余额是否可见，还是只能看到 8 月 31 日余额。">
+                <button type="button" class="screens-side screens-side-next" data-screen-next aria-label="下一屏">
                   <span><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
                 </button>
               </div>
-              <figcaption>3.1 &middot; Every category ends in a balance for today, and none of them says where things stood when the season opened. That missing line is the point.</figcaption>
+              <figcaption>3.1 &middot; 每个类别都以今天的余额结尾，没有一个说明季度开始时的情况。</figcaption>
             </figure>
             <figure class="screens-page">
               <div class="screens-frame">
-                <button type="button" class="screens-side screens-side-prev" data-screen-prev aria-label="Previous screen">
+                <button type="button" class="screens-side screens-side-prev" data-screen-prev aria-label="上一屏">
                   <span><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
                 </button>
-                <img src="./images/module3-what-cash-missed.png" alt="Lesson screen 3.4, What Cash Missed. The liabilities sheet with the credit card expanded into its individual charges, Anna explaining that the 2,030 dollar payoff settled an existing debt rather than creating an expense, and a running bridge panel starting from 2,640 dollars of net income.">
-                <button type="button" class="screens-side screens-side-next" data-screen-next aria-label="Next screen">
+                <img src="./images/module3-what-cash-missed.png" alt="课程屏幕 3.4，现金遗漏了什么。负债表，信用卡展开为单笔费用，Anna 解释 2,030 美元的还款是清偿既有债务而非产生费用，并有一个从 2,640 美元净收入开始的运行桥接面板。">
+                <button type="button" class="screens-side screens-side-next" data-screen-next aria-label="下一屏">
                   <span><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
                 </button>
               </div>
-              <figcaption>3.4 &middot; Paying off the card settles a debt from June 1 without creating an expense, which is precisely where cash and income part company.</figcaption>
+              <figcaption>3.4 &middot; 还清信用卡是清偿 6 月 1 日的债务而不产生费用，这正是现金流量表与利润表不同之处。</figcaption>
             </figure>
           </div>
         </dialog>
 
-        <dialog class="screens" id="module-4-screens" aria-label="Module 4 lesson screens">
+        <dialog class="screens" id="module-4-screens" aria-label="模块 4 课程屏幕">
           <div class="screens-bar">
             <button type="button" class="screens-back" data-close-screens>
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              Back
+              返回
             </button>
-            <span class="screens-title">Module 04 &middot; The Angel Investor</span>
+            <span class="screens-title">模块 04 &middot; 天使投资人</span>
             <div class="screens-nav">
               <span class="screens-count" data-screen-count>1 / 2</span>
             </div>
           </div>
           <div class="screens-body">
+            <p class="screens-intro">将前面的概念汇集起来，展示财务报表如何连接成对企业财务健康状况的全面视图。</p>
             <figure class="screens-page">
               <div class="screens-frame">
-                <button type="button" class="screens-side screens-side-prev" data-screen-prev aria-label="Previous screen">
+                <button type="button" class="screens-side screens-side-prev" data-screen-prev aria-label="上一屏">
                   <span><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
                 </button>
-                <img src="./images/module4-laying-it-out.png" alt="Lesson screen 4.4, Laying It Out. A cash-flow statement assembled in the working tab, grouped into operating, investing and financing activities and reconciling cash from 1,300 dollars on June 1 to 620 on August 31, with a button to christen it the Cash Flow Statement.">
-                <button type="button" class="screens-side screens-side-next" data-screen-next aria-label="Next screen">
+                <img src="./images/module4-laying-it-out.png" alt="课程屏幕 4.4，布局。在工作标签中组装的现金流量表，分为经营、投资和融资活动，将现金从 6 月 1 日的 1,300 美元调整到 8 月 31 日的 620 美元，并有一个按钮将其命名为现金流量表。">
+                <button type="button" class="screens-side screens-side-next" data-screen-next aria-label="下一屏">
                   <span><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
                 </button>
               </div>
-              <figcaption>4.4 &middot; The cash-flow statement gets grouped and totalled into operating, investing and financing, then reconciled back to the cash on hand.</figcaption>
+              <figcaption>4.4 &middot; 现金流量表按经营、投资和融资分组并合计，然后调整回手头现金。</figcaption>
             </figure>
             <figure class="screens-page">
               <div class="screens-frame">
-                <button type="button" class="screens-side screens-side-prev" data-screen-prev aria-label="Previous screen">
+                <button type="button" class="screens-side screens-side-prev" data-screen-prev aria-label="上一屏">
                   <span><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
                 </button>
-                <img src="./images/module4-statements-tie-out.png" alt="Lesson screen 4.5, The Statements Tie Out. The opening and closing balance sheets sit side by side while the student picks which statement explains the 2,040 dollar rise in Member’s Capital.">
-                <button type="button" class="screens-side screens-side-next" data-screen-next aria-label="Next screen">
+                <img src="./images/module4-statements-tie-out.png" alt="课程屏幕 4.5，报表勾稽。期初和期末资产负债表并排显示，学生选择哪张报表解释了成员资本增加 2,040 美元。">
+                <button type="button" class="screens-side screens-side-next" data-screen-next aria-label="下一屏">
                   <span><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
                 </button>
               </div>
-              <figcaption>4.5 &middot; Two balance sheets, side by side, and for each change between them the student names the statement that accounts for it.</figcaption>
+              <figcaption>4.5 &middot; 两张资产负债表并排，对于它们之间的每一项变化，学生说出解释它的报表名称。</figcaption>
             </figure>
           </div>
         </dialog>
 
-        <p>The new pre-work introduces accounting not as a set of definitions and rules to memorize, but as something built through a single business scenario: opening a bike repair shop. The target learning outcome is a transferable mental model of accounting as an information system that arises from the needs of a business, one that scales across different organizations and economic events.</p>
-        <p>To get there, we inverted the usual order. Instead of defining a concept and then applying it, each module opens with a situation the student has to reason about before they have the vocabulary for it. The shop carries across the first four modules, so each new concept attaches to a business the student already understands rather than a fresh abstract example.</p>
+        <p>新的先修课程将会计介绍为通过一个商业场景——开一家自行车维修店——构建起来的东西，而非一套需要记忆的定义和规则。</p>
 
 
-        <p>Within Discovery, every module is built on the same three-stage model: Experience, then Discover, then Formalize. The sequence draws on research-based instructional design strategies, including <a class="link" href="https://doi.org/10.3200/JOEB.81.4.221-224" target="_blank" rel="noopener noreferrer">problem-based learning</a>, <a class="link" href="https://onlinelibrary.wiley.com/doi/full/10.1155/2020/6690082" target="_blank" rel="noopener noreferrer">guided discovery</a>, and <a class="link" href="https://openurl.ebsco.com/EPDB%3Agcd%3A8%3A21499592/detailv2?sid=ebsco%3Aplink%3Ascholar-a&amp;id=ebsco%3Agcd%3A182172858&amp;crl=c&amp;jrnl=19450915" target="_blank" rel="noopener noreferrer">scaffolding</a>.</p>
+
+        <p>目标学习成果是一个可迁移的会计心智模型：会计作为源于企业需求的信息系统，能够扩展到不同的组织和经济事件。</p>
+        <p>为此，我们颠倒了通常的顺序。不是先定义一个概念再应用它，而是每个模块都从一个学生必须在拥有词汇之前进行推理的情境开始。这家店贯穿前四个模块，因此每个新概念都附着在学生已经理解的企业上，而非一个新的抽象例子。</p>
+        <p>在发现阶段，每个模块都建立在相同的三阶段模型上：体验、发现、正式化。该序列借鉴了基于研究的教学设计策略，包括<a class="link" href="https://doi.org/10.3200/JOEB.81.4.221-224" target="_blank" rel="noopener noreferrer">问题式学习</a>、<a class="link" href="https://onlinelibrary.wiley.com/doi/full/10.1155/2020/6690082" target="_blank" rel="noopener noreferrer">引导式发现</a>和<a class="link" href="https://openurl.ebsco.com/EPDB%3Agcd%3A8%3A21499592/detailv2?sid=ebsco%3Aplink%3Ascholar-a&amp;id=ebsco%3Agcd%3A182172858&amp;crl=c&amp;jrnl=19450915" target="_blank" rel="noopener noreferrer">脚手架</a>。</p>
 
         <div class="stages">
           <div class="stage">
             <div class="stage-head">
               <span class="stage-n">01</span>
-              <h4>Experience</h4>
+              <h4>体验</h4>
             </div>
-            <p class="stage-sub">Entering the story without knowing the end.</p>
+            <p class="stage-sub">进入故事，不知道结局。</p>
             <div class="stage-eg">
-              <span>In Module 1</span>
-              <p>The side gig has grown too tangled to track from memory.</p>
+              <span>在模块 1 中</span>
+              <p>副业已经变得太乱，无法凭记忆追踪。</p>
             </div>
           </div>
 
@@ -1789,12 +1858,12 @@
           <div class="stage">
             <div class="stage-head">
               <span class="stage-n">02</span>
-              <h4>Discover</h4>
+              <h4>发现</h4>
             </div>
-            <p class="stage-sub">Building the accounting logic step by step.</p>
+            <p class="stage-sub">一步一步建立会计逻辑。</p>
             <div class="stage-eg">
-              <span>In Module 1</span>
-              <p>Students sort what belongs in the records into Things or Promises.</p>
+              <span>在模块 1 中</span>
+              <p>学生将属于记录的内容分类为“物品”或“承诺”。</p>
             </div>
           </div>
 
@@ -1805,96 +1874,90 @@
           <div class="stage">
             <div class="stage-head">
               <span class="stage-n">03</span>
-              <h4>Formalize</h4>
+              <h4>正式化</h4>
             </div>
-            <p class="stage-sub">Naming the emerging ideas in conventional accounting language.</p>
+            <p class="stage-sub">用传统会计语言命名涌现的想法。</p>
             <div class="stage-eg">
-              <span>In Module 1</span>
-              <p>The accounting entity arrives, with assets and liabilities.</p>
+              <span>在模块 1 中</span>
+              <p>会计主体出现，连同资产和负债。</p>
             </div>
           </div>
         </div>
 
-      </section>
 
+        <h3>AI 导师设计</h3>
+        <p>这些学生大多初次接触会计，而先修课程是学期开始前的线上课程，当有人卡住时没有讲师在场。为此，我们开发了AI导师Danny。</p>
 
-      <section id="ai-tutor-design">
-        <h2>AI Tutor Design</h2>
-        <p>One reason this project began is a concern about the misuse of current AI chatbots. Students might get inaccurate answers, or bypass the learning process altogether by using AI to answer quiz questions. Beyond those concerns, the need for an effective AI tutor rests on what the course and its real learners require.</p>
-        <p>Most of the students are new to accounting, and our learner study shows that novices asked for more explanation of accounting terms and of the concepts behind them. However, the pre-work is asynchronous and runs online before the semester begins, so an instructor is not always on hand to answer questions quickly.</p>
-        <p>Research on accounting education also shows the potential of integrating an AI tutor into accounting learning: <a class="link" href="https://doi.org/10.1007/978-3-031-89175-5_30" target="_blank" rel="noopener noreferrer">dialogic, Socratic conversation</a> is what deep comprehension of accounting depends on, and <a class="link" href="https://doi.org/10.1080/09639284.2021.2014915" target="_blank" rel="noopener noreferrer">passive learning</a> should be mitigated in how accounting is taught today.</p>
-
-        <h3>Tutor Features</h3>
-        <div class="features" data-gallery="feature" data-center role="group" aria-roledescription="carousel" aria-label="AI tutor features">
+        <div class="features" data-gallery="feature" data-center role="group" aria-roledescription="carousel" aria-label="AI 导师功能">
           <div class="gal-stage">
             <div class="features-viewport" data-viewport>
               <div class="features-track" data-track>
-              <div class="feature" data-slide role="group" aria-roledescription="slide" aria-label="1 of 6">
+              <div class="feature" data-slide role="group" aria-roledescription="slide" aria-label="第 1 个，共 6 个">
                 <div class="feature-shot">
-                  <img src="./images/feature-1.png" alt="The Getting Started lesson page, with the rest of the screen faded back so the docked tutor stands out in the bottom right corner: an Ask Danny button with a tooltip above it reading are you stuck on this.">
+                  <img src="./images/feature-1.png" alt="入门课程页面，屏幕其余部分淡出，使右下角停靠的导师突出显示：一个“询问 Danny”按钮，上方有提示“你卡在这一步了吗”。">
                 </div>
                 <div class="feature-caption">
-                  <h4>Trigger Everywhere</h4>
-                  <p>Students can ask Danny a question at any point, anywhere in the course. Danny opens in a sidebar with quick-ask prompts to get them started.</p>
+                  <h4>随处触发</h4>
+                  <p>学生可以在课程中的任何位置、任何时间向 Danny 提问。Danny 在侧边栏中打开，提供快速提问提示帮助他们开始。</p>
                 </div>
               </div>
 
-              <div class="feature" data-slide role="group" aria-roledescription="slide" aria-label="2 of 6">
+              <div class="feature" data-slide role="group" aria-roledescription="slide" aria-label="第 2 个，共 6 个">
                 <div class="feature-shot">
-                  <img src="./images/feature-2.png" alt="The Sort Your Things lesson with the Danny panel open alongside it. Asked to explain the activity, Danny answers by naming that exact lesson and its Things tab, then lists what belongs there, without the student having said where they were.">
+                  <img src="./images/feature-2.png" alt="“整理你的物品”课程，Danny 面板在旁边打开。当被要求解释活动时，Danny 通过命名该课程及其“物品”标签来回答，然后列出属于那里的内容，而学生并未说明自己在哪里。">
                 </div>
                 <div class="feature-caption">
-                  <h4>Auto-Synced Context</h4>
-                  <p>Danny already knows which lesson the student is on and whether they answered the last question correctly, so nothing has to be explained twice.</p>
+                  <h4>自动同步上下文</h4>
+                  <p>Danny 已经知道学生正在上哪节课，以及他们上一题是否答对，因此无需重复解释。</p>
                 </div>
               </div>
 
-              <div class="feature" data-slide role="group" aria-roledescription="slide" aria-label="3 of 6">
+              <div class="feature" data-slide role="group" aria-roledescription="slide" aria-label="第 3 个，共 6 个">
                 <div class="feature-shot">
-                  <img src="./images/feature-3.png" alt="The Learning Progress panel for Module 1, with the rest of the screen faded back. The Line You Drew carries a warning icon and reads completed, 1 wrong, a What to revisit note names the missed question, and the highlighted Ask for Danny's Help button sits alongside it.">
+                  <img src="./images/feature-3.png" alt="模块 1 的学习进度面板，屏幕其余部分淡出。“你画的线”带有警告图标并显示已完成，1 错误，一条“需要复习什么”的注释指出了错过的题目，旁边有高亮的“向 Danny 求助”按钮。">
                 </div>
                 <div class="feature-caption">
-                  <h4>Immediate Help With Errors</h4>
-                  <p>A wrong answer is marked with a button to get help on the spot. Danny&rsquo;s explanation arrives as an add-on to the activity&rsquo;s default feedback.</p>
+                  <h4>错误即时帮助</h4>
+                  <p>错误答案旁有一个按钮可当场获取帮助。Danny 的解释作为活动默认反馈的补充出现。</p>
                 </div>
               </div>
 
-              <div class="feature" data-slide role="group" aria-roledescription="slide" aria-label="4 of 6">
+              <div class="feature" data-slide role="group" aria-roledescription="slide" aria-label="第 4 个，共 6 个">
                 <div class="feature-shot">
-                  <img src="./images/feature-4.png" alt="A chat exchange with Danny. The student asks how to save the chat to notes, and Danny answers with the steps: select Save as Note, which files an AI-generated summary rather than a word-for-word transcript, then carry on chatting, start a new chat, or reopen a recent one. Three suggested follow-up questions sit below.">
+                  <img src="./images/feature-4.png" alt="与 Danny 的聊天交流。学生询问如何将聊天保存到笔记，Danny 回答步骤：选择“保存为笔记”，它会归档 AI 生成的摘要而非逐字转录，然后继续聊天、开始新聊天或重新打开最近的聊天。下方有三个建议的后续问题。">
                 </div>
                 <div class="feature-caption">
-                  <h4>Need-Based Tutorial</h4>
-                  <p>Danny explains how the interface works when a student asks, one step at a time, and skips the parts the design already makes obvious.</p>
+                  <h4>按需教程</h4>
+                  <p>当学生询问时，Danny 逐步解释界面如何工作，并跳过设计已经显而易见的步骤。</p>
                 </div>
               </div>
 
-              <div class="feature" data-slide role="group" aria-roledescription="slide" aria-label="5 of 6">
+              <div class="feature" data-slide role="group" aria-roledescription="slide" aria-label="第 5 个，共 6 个">
                 <div class="feature-shot">
-                  <img src="./images/feature-5.png" alt="A saved note titled Understanding Assets. It opens with a summary of what the session covered, tags three core concepts, lists three key learning points, and offers buttons to add it to saved notes or download the summary.">
+                  <img src="./images/feature-5.png" alt="一条标题为“理解资产”的已保存笔记。它以本次会话涵盖内容的摘要开头，标记了三个核心概念，列出了三个关键学习点，并提供将其添加到已保存笔记或下载摘要的按钮。">
                 </div>
                 <div class="feature-caption">
-                  <h4>Save to Notes</h4>
-                  <p>One click turns the conversation into a summary and files it in the student&rsquo;s notes for later review.</p>
+                  <h4>保存到笔记</h4>
+                  <p>一键将对话转为摘要，并归档到学生的笔记中供日后复习。</p>
                 </div>
               </div>
 
-              <div class="feature" data-slide role="group" aria-roledescription="slide" aria-label="6 of 6">
+              <div class="feature" data-slide role="group" aria-roledescription="slide" aria-label="第 6 个，共 6 个">
                 <div class="feature-shot">
-                  <img src="./images/feature-6.png" alt="Two views of a call with Danny, stacked. Above, the call header with a running timer and an End call button, and Danny's spoken greeting shown as text. Below, Danny's avatar marked Connected, with Mute and Jump in controls.">
+                  <img src="./images/feature-6.png" alt="与 Danny 通话的两个堆叠视图。上方是通话标题，带有运行计时器和结束通话按钮，Danny 的语音问候以文本显示。下方是标记为已连接的 Danny 头像，带有静音和加入控制。">
                 </div>
                 <div class="feature-caption">
-                  <h4>Call Mode</h4>
-                  <p>Students can speak to Danny and follow the transcript at the same time, and can cut in mid-response the way a real conversation works.</p>
+                  <h4>通话模式</h4>
+                  <p>学生可以一边与 Danny 交谈，一边跟随文字记录，并且可以像真实对话那样在回复中途插话。</p>
                 </div>
               </div>
               </div>
             </div>
 
-            <button type="button" class="gal-arrow gal-arrow-prev" data-prev aria-label="Previous feature">
+            <button type="button" class="gal-arrow gal-arrow-prev" data-prev aria-label="上一项功能">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </button>
-            <button type="button" class="gal-arrow gal-arrow-next" data-next aria-label="Next feature">
+            <button type="button" class="gal-arrow gal-arrow-next" data-next aria-label="下一项功能">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </button>
           </div>
@@ -1904,93 +1967,86 @@
           </div>
         </div>
 
-        <figure class="diagram">
-          <a href="./images/tutor-feature-map.png" target="_blank" rel="noopener noreferrer" aria-label="Open the feature map at full size">
-            <img src="./images/tutor-feature-map.png" alt="Feature map of the study window. Four branches: accounting lessons with in-lesson checks, the docked Danny chat with grounded answers and save-as-note, notes with AI-generated notes, and practice with weak-spot drills. The chat and practice both connect to a learner model, Danny's running record of each student's misconceptions, which in turn feeds practice.">
-          </a>
-          <figcaption>Every branch feeds the learner model, and the learner model decides what practice comes back.</figcaption>
-        </figure>
-      </section>
 
-
-      <section id="dashboard-design">
-        <h2>Dashboard Design</h2>
-        <p>To better understand how students perform, and to inform future iterations of the course, we designed an instructor dashboard.</p>
-        <ul>
-          <li><strong>Student learning data.</strong> Records attempts, answers, and mistakes.</li>
-          <li><strong>Difficulty ranking.</strong> Ranks pages and questions by where students go wrong, so instructors can see which parts of the course are hardest.</li>
-          <li><strong>Anonymous information.</strong> Accounts are created from an email roster, and learning patterns are never tied to names.</li>
-          <li><strong>Danny usage at a glance.</strong> Engagement counts, the text-versus-voice split, common question themes, and a cohort summary linking questions to the mistakes behind them.</li>
-          <li><strong>Knowledge base management.</strong> Refresh Danny&rsquo;s knowledge base in one click when content changes, and export everything to a spreadsheet.</li>
-        </ul>
+        <h3>仪表盘设计</h3>
+        <p>为了更好地了解学生的表现，并帮助课程进行未来迭代，我们设计了一个讲师仪表盘。</p>
+        <details class="reveal reveal-block">
+          <summary><span class="reveal-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>仪表盘显示的内容</summary>
+          <ul>
+            <li><strong>学生学习数据：</strong> 记录尝试、答案和错误。</li>
+            <li><strong>难度排名：</strong> 按学生出错的地方对页面和问题进行排名，让讲师看到课程中最难的部分。</li>
+            <li><strong>匿名信息：</strong> 账户从电子邮件名册创建，学习模式从不与姓名关联。</li>
+            <li><strong>Danny 使用情况一览：</strong> 参与计数、文本与语音的划分、常见问题主题，以及将问题与背后错误关联的群体摘要。</li>
+            <li><strong>知识库管理：</strong> 内容变更时一键刷新 Danny 的知识库，并将所有内容导出到电子表格。</li>
+          </ul>
+        </details>
         <figure class="wide-shot">
-          <a href="./images/admin-dashboard.png" target="_blank" rel="noopener noreferrer" aria-label="Open the dashboard at full size">
-            <img src="./images/admin-dashboard.png" alt="The admin dashboard, subtitled progress and correctness, no PII. A cohort filter above seven summary tiles: 10 students, 4 started, 0 completed, 2 percent average completion, 60 percent correct rate, 15 minute median active time, 15 Danny chats. Below, a completion spread bar chart and per-module completion for all six modules, then collapsed panels for common mistakes, Danny insights, and Danny's knowledge base.">
+          <a href="./images/admin-dashboard.png" target="_blank" rel="noopener noreferrer" aria-label="全尺寸打开仪表盘">
+            <img src="./images/admin-dashboard.png" alt="管理员仪表盘，副标题为进度与正确率，无个人身份信息。上方有群体筛选器和七个摘要卡片：10 名学生、4 人已开始、0 人完成、平均完成度 2%、正确率 60%、中位活跃时间 15 分钟、15 次 Danny 聊天。下方是完成度分布条形图和全部六个模块的每模块完成度，然后是常见错误、Danny 洞察和 Danny 知识库的折叠面板。">
           </a>
-          <figcaption>The instructor view: cohort progress, per-module completion, and Danny usage, with no identifying information attached. Open it full size to read the detail.</figcaption>
+          <figcaption>讲师视图：群体进度、每模块完成度和 Danny 使用情况，不附带任何身份信息。全尺寸打开以阅读详细信息。</figcaption>
         </figure>
       </section>
 
 
       <section id="testing">
-        <h2>Testing</h2>
-        <p>We ran a controlled pilot with 31 participants in June 2026 to test the redesigned module and the AI tutor. Because of time constraints, the study covered only the first three tutorials of Module 1. Participants were mainly CMU students from different backgrounds and levels of prior accounting knowledge, chosen to represent the diverse backgrounds of MBA and EMBA students. Participants were randomly split into two groups: 15 used the AI tutor (Danny) and 16 did not. Both groups completed a pre-test, the tutorials, a post-test, and a feedback survey.</p>
+        <h2>测试</h2>
+        <p>我们在 2026 年 6 月进行了一项有 31 名参与者参与的对照试验：15 人进行学习时使用AI导师Danny，16 人不使用。</p>
         <div class="result">
           <div class="result-metric">
             <div class="result-head">
-              <span class="result-name">Clean completion</span>
-              <span class="result-delta">12% ahead</span>
+              <span class="result-name">无错误完成</span>
+              <span class="result-delta">领先 12%</span>
             </div>
             <div class="result-row">
-              <span class="result-who">With Danny</span>
+              <span class="result-who">使用 Danny</span>
               <span class="chart-track" aria-hidden="true"><span class="chart-fill" style="width: 100.0%"></span></span>
               <span class="result-num">70%</span>
             </div>
             <div class="result-row">
-              <span class="result-who">Control</span>
+              <span class="result-who">对照组</span>
               <span class="chart-track" aria-hidden="true"><span class="chart-fill is-control" style="width: 82.9%"></span></span>
               <span class="result-num">58%</span>
             </div>
           </div>
           <div class="result-metric">
             <div class="result-head">
-              <span class="result-name">First-try correct</span>
-              <span class="result-delta">11% ahead</span>
+              <span class="result-name">首次尝试正确</span>
+              <span class="result-delta">领先 11%</span>
             </div>
             <div class="result-row">
-              <span class="result-who">With Danny</span>
+              <span class="result-who">使用 Danny</span>
               <span class="chart-track" aria-hidden="true"><span class="chart-fill" style="width: 100.0%"></span></span>
               <span class="result-num">97%</span>
             </div>
             <div class="result-row">
-              <span class="result-who">Control</span>
+              <span class="result-who">对照组</span>
               <span class="chart-track" aria-hidden="true"><span class="chart-fill is-control" style="width: 88.7%"></span></span>
               <span class="result-num">86%</span>
             </div>
           </div>
           <div class="result-metric">
             <div class="result-head">
-              <span class="result-name">Avg. mistakes</span>
-              <span class="result-delta">41% fewer</span>
+              <span class="result-name">平均错误数</span>
+              <span class="result-delta">减少 41%</span>
             </div>
             <div class="result-row">
-              <span class="result-who">With Danny</span>
+              <span class="result-who">使用 Danny</span>
               <span class="chart-track" aria-hidden="true"><span class="chart-fill" style="width: 59.1%"></span></span>
               <span class="result-num">3.9</span>
             </div>
             <div class="result-row">
-              <span class="result-who">Control</span>
+              <span class="result-who">对照组</span>
               <span class="chart-track" aria-hidden="true"><span class="chart-fill is-control" style="width: 100.0%"></span></span>
               <span class="result-num">6.6</span>
             </div>
           </div>
         </div>
 
-        <p>In that survey, the 15 who worked with the tutor rated the instructional content across five dimensions on a 1 to 5 scale.</p>
         <figure class="chart">
           <div class="chart-rows">
             <div class="chart-row">
-              <span class="chart-label">Overall Experience</span>
+              <span class="chart-label">整体体验</span>
               <span class="stars" aria-hidden="true">
                 <span class="stars-base">
                   <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
@@ -2010,7 +2066,7 @@
               <span class="chart-value">4.67</span>
             </div>
             <div class="chart-row">
-              <span class="chart-label">Clarity</span>
+              <span class="chart-label">清晰度</span>
               <span class="stars" aria-hidden="true">
                 <span class="stars-base">
                   <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
@@ -2030,7 +2086,7 @@
               <span class="chart-value">4.73</span>
             </div>
             <div class="chart-row">
-              <span class="chart-label">Usefulness</span>
+              <span class="chart-label">实用性</span>
               <span class="stars" aria-hidden="true">
                 <span class="stars-base">
                   <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
@@ -2050,7 +2106,7 @@
               <span class="chart-value">4.60</span>
             </div>
             <div class="chart-row">
-              <span class="chart-label">Confidence</span>
+              <span class="chart-label">信心</span>
               <span class="stars" aria-hidden="true">
                 <span class="stars-base">
                   <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
@@ -2070,7 +2126,7 @@
               <span class="chart-value">4.27</span>
             </div>
             <div class="chart-row">
-              <span class="chart-label">Engagement</span>
+              <span class="chart-label">参与度</span>
               <span class="stars" aria-hidden="true">
                 <span class="stars-base">
                   <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
@@ -2090,68 +2146,40 @@
               <span class="chart-value">4.60</span>
             </div>
           </div>
-          <figcaption>Post-survey ratings from the AI tutor group, mean of 15 responses on a 1 to 5 scale.</figcaption>
+          <figcaption>AI 导师组的课后评分，15 份回复的平均值，采用 1 至 5 分制。</figcaption>
         </figure>
 
+
         <blockquote>
-          The way this module is set up makes accounting seem less scary. It&rsquo;s kind of like storytelling. Not the usual way to study accounting, but it was really easy to follow along and kept me engaged.
-          <cite>Pilot participant, novice learner</cite>
+          这个模块的设置方式让会计看起来不那么可怕。有点像讲故事。不是学习会计的常规方式，但真的很容易跟上，让我保持投入。
+          <cite>试点参与者，有商业背景的学习者</cite>
         </blockquote>
       </section>
 
 
       <section id="impact">
-        <h2>Impact</h2>
-        <p>Where the original course was built more than a decade ago for a narrower audience, the redesigned pre-work frames accounting the way today's MBA and EMBA students will actually use it: as decision-makers who interpret financial information rather than produce it. The work goes to the Dean of the Yale School of Management and to CMU's Tepper School of Business, with the course due to launch for Yale students next year and to inform how accounting courses are developed at Tepper.</p>
+        <h2>影响</h2>
+        <p>这项工作已提交给耶鲁大学管理学院院长和 CMU 的 Tepper 商学院，课程将于明年面向耶鲁学生推出，并为 Tepper 商学院 的会计课程开发提供参考。</p>
 
         <div class="info-cards is-two">
           <div class="info-card">
-            <h4>For learners</h4>
-            <p>Instead of passive videos explaining numbers and equations, the pre-work introduces every concept through a tangible, story-driven scenario. Learners from any background can follow the reasoning and reach core ideas like the accounting identity as a conclusion rather than a formula to memorize.</p>
+            <h4>对学习者</h4>
+            <p>先修课程不再是被动解释数字和方程的的视频，而是通过一个可感知的、故事驱动的真实场景引入每个概念。任何背景的学习者都能跟上推理，并将会计恒等式等核心思想作为结论而非需要记忆的公式来理解。</p>
           </div>
           <div class="info-card">
-            <h4>For teaching</h4>
-            <p>Because every activity and tutor conversation is captured in a shared database, instructors can see how students actually move through the material: where they hesitate, what they get wrong, and which concepts they bring to the tutor. Rather than a one-off deliverable, they get a working model they can develop further, with learning data to iterate against.</p>
+            <h4>对教学</h4>
+            <p>由于每个活动和导师对话都记录在共享数据库中，讲师可以看到学生实际如何学习材料：他们在哪里犹豫，什么做错了，以及他们向导师提出了哪些概念。他们得到的不是一个一次性交付物，而是一个可以进一步开发的可用模型，以及可供迭代的学习数据。</p>
           </div>
         </div>
       </section>
 
-      <section id="reflection">
-        <h2>Reflection</h2>
-
-        <div class="info-cards">
-          <div class="info-card">
-            <h4>What I learned</h4>
-            <details class="reveal">
-              <summary><span class="reveal-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Collaborating across a team of different roles.</summary>
-              <p>Research, design, and development each read the same finding differently, so a result that looked settled to me still had to be restated in the terms the next person worked in. Communicating a decision turned out to be as much of the job as reaching one.</p>
-            </details>
-            <details class="reveal">
-              <summary><span class="reveal-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Using testing results to argue for a design.</summary>
-              <p>It is easy to defend a choice with how we assume people will use something. The pilot gave firmer ground: the survey named the fix learners asked for most, and the learner study showed which explanations novices actually wanted. Pointing at that evidence settled disagreements faster than intuition did.</p>
-            </details>
-          </div>
-          <div class="info-card">
-            <h4>What I would improve</h4>
-            <details class="reveal">
-              <summary><span class="reveal-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Involve learners more directly in the design process.</summary>
-              <p>Most of the design conversation happened between the professors and our development team. We did substantial research with current students early on, but that research informed the design from the outside rather than having students help shape it. Bringing them into the design process itself, not only as research subjects, is something we would do more of next time.</p>
-            </details>
-            <details class="reveal">
-              <summary><span class="reveal-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Test for longer, with real usage over time.</summary>
-              <p>Because of the time available for testing sessions, our pilot covered only the first three tutorials of Module 1. Given a longer timeframe we would test across a wider stretch of the course and iterate on how students actually use it, rather than relying on a single session.</p>
-            </details>
-          </div>
-        </div>
-      </section>
-
-      <nav class="pager" aria-label="More work">
+            <nav class="pager" aria-label="更多作品">
         <div class="pager-prev">
-          <span class="k">Previous</span>
-          <a class="link" href="#">X Academy</a>
+          <span class="k">上一个</span>
+          <a class="link" href="./X-Academy-cn.html">X Academy</a>
         </div>
 
-        <a class="pager-home" href="index.html" aria-label="Back to home">
+        <a class="pager-home" href="index-cn.html" aria-label="返回首页">
           <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
             <circle cx="20" cy="20" r="19" fill="var(--tennis)"/>
             <g fill="none" stroke="var(--seam)" stroke-width="2" stroke-linecap="round">
@@ -2160,25 +2188,17 @@
             </g>
           </svg>
         </a>
-
-        <div class="pager-next">
-          <span class="k">Next</span>
-          <a class="link" href="#">STEM Edtech in Africa</a>
-        </div>
       </nav>
     </div>
 
-    <nav class="toc" aria-label="Sections">
+    <nav class="toc" aria-label="章节">
       <div class="toc-inner">
-        <a href="#overview">Overview</a>
-        <a href="#problem">Problem</a>
-        <a href="#user-study">User Study</a>
-        <a href="#instructional-design">Instructional Design</a>
-        <a href="#ai-tutor-design">AI Tutor Design</a>
-        <a href="#dashboard-design">Dashboard Design</a>
-        <a href="#testing">Testing</a>
-        <a href="#impact">Impact</a>
-        <a href="#reflection">Reflection</a>
+        <a href="#overview">概述</a>
+        <a href="#problem">问题</a>
+        <a href="#solution">解决方案</a>
+        <a href="#testing">测试</a>
+        <a href="#impact">影响</a>
+        <!-- <a href="#reflection">反思</a> -->
       </div>
     </nav>
   </div>
@@ -2311,7 +2331,7 @@
       const dots = real.map((_, i) => {
         const dot = document.createElement('button');
         dot.type = 'button';
-        dot.setAttribute('aria-label', 'Show ' + noun + ' ' + (i + 1));
+        dot.setAttribute('aria-label', '显示' + noun + ' ' + (i + 1));
         dot.addEventListener('click', () => {
           if (busy || i === index) return;
           index = i;

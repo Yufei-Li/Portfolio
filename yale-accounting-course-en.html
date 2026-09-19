@@ -1,0 +1,2425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI-Assisted Accounting Introduction Pedagogy Design | Yufei Li</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* ---- shared tokens (identical block in index.html) ---- */
+  :root {
+    --bg: #ffffff;
+    --ink: #000000;
+    --grey: #737373;
+    --grey-line: #c4c4c4;
+    --grey-dim: #a3a3a3;
+    --rule: #e5e5e5;
+    --panel: #f5f5f5;
+    --tennis: #d7e34b;
+    --seam: #ffffff;
+
+    --mark-size: clamp(23px, 2.6vh, 28px);
+    --fs-h1: clamp(15px, 1.7vh, 18px);
+    --fs-heading: clamp(15px, 1.7vh, 18px);
+    --fs-body: clamp(15px, 1.7vh, 18px);
+    --fs-small: clamp(13px, 1.5vh, 15px);
+    --fs-footer: clamp(14px, 1.6vh, 16px);
+
+    --sp-mark: clamp(16px, 3.4vh, 44px);
+    --sp-intro: clamp(22px, 4.6vh, 56px);
+    --sp-section: clamp(20px, 4.2vh, 50px);
+    --sp-label: clamp(10px, 2vh, 18px);
+    --sp-para: clamp(6px, 1.2vh, 12px);
+    --sp-list: clamp(7px, 1.4vh, 12px);
+
+    --sp-top: clamp(24px, 6vh, 64px);
+    --gutter: clamp(24px, 8vw, 120px);
+    --measure: 470px;
+  }
+
+  * { box-sizing: border-box; }
+  html { color-scheme: light; scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Geist', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    font-weight: 400;
+    transition: background 0.3s ease, color 0.3s ease;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    body, a { transition: none !important; }
+    .mark-ball, .mark-back, .mark-label { transition: opacity 0.01s linear !important; }
+    .mark-back, .mark-link:hover .mark-ball { transform: none !important; }
+    .pager-home:hover { transform: none !important; }
+  }
+
+  /* 3-column grid keeps the middle column centred no matter what the rail does,
+     so the logo sits at the same x position as on the homepage */
+  .page {
+    flex: 1;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr minmax(0, 560px) 1fr;
+    padding: var(--sp-top) var(--gutter) 0;
+  }
+
+  .content { grid-column: 2; min-width: 0; }
+
+  /* ---- section rail ---- */
+  .toc {
+    grid-column: 3;
+    justify-self: start;
+    align-self: start;
+    /* grid items default to min-width:auto, so the rail's own width was forcing
+       column 3 wider than its 1fr share and shoving the text column off centre
+       between about 1400 and 1520px. Let the column shrink; the rail can spill
+       harmlessly into the right gutter. */
+    min-width: 0;
+    position: sticky;
+    top: 50%;
+    transform: translateY(-50%);
+    /* margin, not padding: padding would extend the box back over the
+       persona arrows and swallow their clicks */
+    margin-left: clamp(195px, 13vw, 230px);
+    pointer-events: none;
+  }
+
+  .toc a { pointer-events: auto; }
+
+  .toc-inner { border-left: 1px solid var(--rule); }
+
+  .toc a {
+    position: relative;
+    display: block;
+    padding: 5px 0 5px 16px;
+    font-size: var(--fs-body);
+    line-height: 1.5;
+    color: var(--grey-dim);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: color 0.2s ease;
+  }
+
+  .toc a::before {
+    content: "";
+    position: absolute;
+    left: -1px;
+    top: 5px;
+    bottom: 5px;
+    width: 2px;
+    background: var(--ink);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  .toc a:hover { color: var(--grey); }
+
+  .toc a.active { color: var(--ink); }
+  .toc a.active::before { opacity: 1; }
+
+  @media (max-width: 1400px) {
+    .toc { display: none; }
+  }
+
+  a { color: inherit; }
+
+  a.link {
+    font-size: var(--fs-body);
+    color: var(--grey);
+    text-decoration: underline;
+    text-decoration-color: var(--grey-line);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+    transition: color 0.15s ease, text-decoration-color 0.15s ease;
+  }
+
+  a.link:hover, a.link:focus-visible {
+    color: var(--ink);
+    text-decoration-color: var(--grey);
+  }
+
+  /* ---- tennis ball that becomes a back button ---- */
+  .mark-link {
+    position: relative;
+    display: inline-block;
+    width: var(--mark-size);
+    height: var(--mark-size);
+    margin-bottom: var(--sp-mark);
+    text-decoration: none;
+    border-radius: 50%;
+  }
+
+  .mark-ball,
+  .mark-back {
+    position: absolute;
+    inset: 0;
+    transition: opacity 0.28s ease, transform 0.28s ease;
+  }
+
+  .mark-ball svg,
+  .mark-back svg { display: block; width: 100%; height: 100%; }
+
+  .mark-ball { opacity: 1; transform: rotate(0deg) scale(1); }
+  .mark-back { opacity: 0; transform: rotate(-90deg) scale(0.6); }
+
+  .mark-link:hover .mark-ball,
+  .mark-link:focus-visible .mark-ball {
+    opacity: 0;
+    transform: rotate(-90deg) scale(0.6);
+  }
+
+  .mark-link:hover .mark-back,
+  .mark-link:focus-visible .mark-back {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+  }
+
+  .mark-label {
+    position: absolute;
+    left: calc(var(--mark-size) + 12px);
+    top: 50%;
+    transform: translateY(-50%) translateX(-6px);
+    white-space: nowrap;
+    font-size: var(--fs-footer);
+    color: var(--grey);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.28s ease, transform 0.28s ease;
+  }
+
+  .mark-link:hover .mark-label,
+  .mark-link:focus-visible .mark-label {
+    opacity: 1;
+    transform: translateY(-50%) translateX(0);
+  }
+
+  h1 {
+    font-size: var(--fs-h1);
+    font-weight: 400;
+    letter-spacing: -0.005em;
+    line-height: 1.35;
+    margin: 0 0 var(--sp-para);
+    color: var(--ink);
+  }
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 8px 32px;
+    padding: var(--sp-label) 0;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: var(--sp-intro);
+  }
+
+  .meta div:last-child { text-align: right; align-items: flex-end; }
+
+  .meta div { display: flex; flex-direction: column; }
+  .meta .k { color: var(--grey-dim); font-size: var(--fs-small); }
+  .meta .v { color: var(--ink); font-size: var(--fs-body); }
+
+  section { margin-bottom: var(--sp-section); scroll-margin-top: var(--sp-top); }
+
+  h2 {
+    font-size: var(--fs-heading);
+    font-weight: 400;
+    letter-spacing: -0.005em;
+    margin: 0 0 var(--sp-label);
+    color: var(--ink);
+  }
+
+  h3 {
+    font-size: var(--fs-body);
+    font-weight: 400;
+    color: var(--grey);
+    /* a bottom margin so a bare paragraph below does not sit flush; where the
+       next block has its own top margin the two collapse and nothing changes */
+    margin: var(--sp-label) 0 var(--sp-para);
+    letter-spacing: -0.005em;
+  }
+
+  /* a subheading that follows a previous subsection needs section-scale air
+     above it; directly under its own h2 the label-scale gap is right */
+  * + h3 { margin-top: var(--sp-section); }
+  h2 + h3 { margin-top: var(--sp-label); }
+
+  p {
+    font-size: var(--fs-body);
+    line-height: 1.6;
+    color: var(--grey);
+    margin: 0 0 var(--sp-para);
+  }
+
+  p:last-child { margin-bottom: 0; }
+
+  strong { font-weight: 400; color: var(--ink); }
+
+  ul {
+    font-size: var(--fs-body);
+    line-height: 1.6;
+    margin: 0 0 var(--sp-para);
+    padding-left: 20px;
+    color: var(--grey);
+  }
+
+  li { margin-bottom: var(--sp-list); }
+
+  figure { margin: var(--sp-section) 0; }
+
+  .placeholder {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    background: var(--panel);
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--grey-dim);
+    font-size: var(--fs-small);
+  }
+
+  /* ---- macbook mockup ---- */
+  .device { width: 100%; }
+
+  .device-screen {
+    position: relative;
+    background: #1d1d1f;
+    border-radius: 11px;
+    padding: 15px 9px 10px;
+  }
+
+  /* camera */
+  .device-screen::before {
+    content: "";
+    position: absolute;
+    top: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: #3f3f42;
+  }
+
+  .device-screen img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 2px;
+    background: #fff;
+  }
+
+  .device-base {
+    position: relative;
+    width: 114%;
+    margin-left: -7%;
+    height: 11px;
+    background: linear-gradient(180deg, #cfcfd2 0%, #b6b6ba 55%, #97979c 100%);
+    border-radius: 0 0 10px 10px;
+  }
+
+  /* thumb groove */
+  .device-base::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 13%;
+    height: 5px;
+    background: #a9a9ae;
+    border-radius: 0 0 5px 5px;
+  }
+
+
+
+  /* ---- screenshot with a baked-in play icon (static, not interactive) ---- */
+  .shot {
+    display: block;
+    width: 100%;
+    line-height: 0;
+  }
+
+  .shot img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+  }
+
+  /* ---- persona gallery: held to the body measure, next card peeks in ---- */
+  .personas {
+    width: 100%;
+    margin-top: var(--sp-label);
+  }
+
+  .personas-viewport {
+    overflow: hidden;
+    margin: 0 -2px;
+    padding: 2px;
+  }
+
+  .personas-track {
+    display: flex;
+    align-items: stretch;
+    gap: 14px;
+    transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .persona {
+    flex: 0 0 calc(100% - 84px);
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    padding: 20px;
+    transition: opacity 0.35s ease;
+  }
+
+  /* keyed off is-active, not aria-hidden: during a wrap the slide sliding in is a
+     clone, which stays aria-hidden but must still look fully lit */
+  .persona:not(.is-active) {
+    opacity: 0.45;
+    cursor: pointer;
+  }
+
+  .persona h4 {
+    font-size: var(--fs-body);
+    font-weight: 400;
+    color: var(--ink);
+    margin: 0 0 2px;
+    letter-spacing: -0.005em;
+  }
+
+  .persona .note {
+    font-size: var(--fs-small);
+    color: var(--grey-dim);
+    margin: 0 0 9px;
+    line-height: 1.45;
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-bottom: 10px;
+  }
+
+  .tags span {
+    font-size: var(--fs-small);
+    color: var(--grey);
+    border: 1px solid var(--rule);
+    border-radius: 100px;
+    padding: 2px 9px;
+    white-space: nowrap;
+  }
+
+  .persona .k {
+    display: block;
+    font-size: var(--fs-small);
+    color: var(--grey-dim);
+    margin-bottom: 1px;
+  }
+
+  .persona p {
+    font-size: var(--fs-body);
+    line-height: 1.5;
+    color: var(--grey);
+    margin: 0 0 9px;
+  }
+
+  .persona .quote {
+    margin: 3px 0 0;
+    padding-top: 10px;
+    border-top: 1px solid var(--rule);
+    line-height: 1.5;
+    color: var(--ink);
+  }
+
+  /* ---- gallery controls ---- */
+  .gal-stage { position: relative; }
+
+  .gal-arrow {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 46px;
+    padding: 0;
+    background: none;
+    border: none;
+    color: var(--grey-dim);
+    cursor: pointer;
+    transition: color 0.2s ease, opacity 0.2s ease;
+  }
+
+  .gal-arrow:hover:not(:disabled) { color: var(--ink); }
+
+  .gal-arrow:disabled {
+    opacity: 0.25;
+    cursor: default;
+  }
+
+  .gal-arrow svg {
+    width: 22px;
+    height: 22px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+  }
+
+  .gal-arrow-prev { left: -58px; }
+  .gal-arrow-next { right: -58px; }
+
+  /* not enough room in the margins: tuck the arrows against the card edges */
+  @media (max-width: 860px) {
+    .gal-arrow { width: 40px; }
+    .gal-arrow-prev {
+      left: 0;
+      background: linear-gradient(to right, var(--bg) 55%, transparent);
+    }
+    .gal-arrow-next {
+      right: 0;
+      background: linear-gradient(to left, var(--bg) 55%, transparent);
+    }
+  }
+
+  .gal-controls {
+    display: flex;
+    justify-content: center;
+    margin-top: 14px;
+  }
+
+  .gal-dots {
+    display: flex;
+    gap: 8px;
+  }
+
+  .gal-dots button {
+    width: 7px;
+    height: 7px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: var(--grey-line);
+    opacity: 0.5;
+    cursor: pointer;
+    transition: opacity 0.2s ease, background 0.2s ease;
+  }
+
+  .gal-dots button[aria-current="true"] {
+    background: var(--ink);
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .personas-track,
+    .persona,
+    .features-track,
+    .feature,
+    .reveal-icon { transition: none !important; }
+  }
+
+  /* ---- tutor feature gallery: next slide peeks in, like the personas ---- */
+  .features { margin: var(--sp-label) 0 0; }
+
+  .features-viewport {
+    overflow: hidden;
+    margin: 0 -2px;
+    padding: 2px;
+  }
+
+  .features-track {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* room for a peek on both sides: 44px of each neighbour plus the two 14px gaps */
+  .feature {
+    flex: 0 0 calc(100% - 116px);
+    transition: opacity 0.35s ease;
+  }
+
+  /* narrower screens cannot spare 116px, so shrink the peek rather than the slide */
+  @media (max-width: 700px) {
+    .feature { flex: 0 0 calc(100% - 72px); }
+  }
+
+  .feature:not(.is-active) {
+    opacity: 0.45;
+    cursor: pointer;
+  }
+
+  /* one fixed frame for every slide, so captures of different shapes all give the
+     same slide height. The picture is centred in it rather than stretched. */
+  .feature-shot {
+    aspect-ratio: 1774 / 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* max-width and max-height together, never object-fit cover: cover would crop
+     the callout off the edge of the wide shots */
+  .feature-shot img {
+    display: block;
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    background: var(--panel);
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+  }
+
+  .feature-caption { margin-top: 13px; }
+
+  .feature-caption h4 {
+    font-size: var(--fs-body);
+    font-weight: 400;
+    color: var(--ink);
+    margin: 0 0 4px;
+    letter-spacing: -0.005em;
+  }
+
+  .feature-caption p {
+    font-size: var(--fs-small);
+    line-height: 1.5;
+    color: var(--grey);
+    margin: 0;
+  }
+
+  /* ---- hero deck and headline results, for the reader who gives it 5 seconds ---- */
+  /* the client name sits on its own line, without needing a <br> */
+  .deck strong {
+    display: block;
+    margin-bottom: 5px;
+  }
+
+  .deck {
+    font-size: var(--fs-heading);
+    line-height: 1.4;
+    font-weight: 400;
+    color: var(--grey);
+    letter-spacing: -0.005em;
+    margin: 0 0 var(--sp-intro);
+  }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    padding: var(--sp-label) 0;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: var(--sp-intro);
+  }
+
+  .stat-n {
+    display: block;
+    font-size: var(--fs-heading);
+    line-height: 1.2;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+
+  .stat-l {
+    display: block;
+    margin-top: 3px;
+    font-size: var(--fs-small);
+    line-height: 1.4;
+    color: var(--grey);
+  }
+
+  @media (max-width: 520px) {
+    .stats { grid-template-columns: 1fr; gap: 11px; }
+  }
+
+  /* a section-level disclosure: the detail is kept, just not in the default read */
+  .reveal-block {
+    border-top: 1px solid var(--rule);
+    margin-top: var(--sp-label);
+  }
+
+  .reveal.reveal-block:last-child { border-bottom: 1px solid var(--rule); }
+
+  /* ---- info cards, shared by Impact and Reflection ---- */
+  .info-cards {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin: var(--sp-label) 0;
+  }
+
+  /* two across only where the two cards hold comparable amounts of text */
+  .info-cards.is-two { grid-template-columns: 1fr 1fr; }
+
+  .info-card {
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    padding: 18px;
+  }
+
+  .info-card h4 {
+    font-size: var(--fs-body);
+    font-weight: 400;
+    color: var(--ink);
+    margin: 0 0 7px;
+    letter-spacing: -0.005em;
+  }
+
+  .info-card p {
+    font-size: var(--fs-small);
+    line-height: 1.5;
+    color: var(--grey);
+    margin: 0;
+  }
+
+  .info-card p + p { margin-top: 11px; }
+
+  .info-card ul {
+    font-size: var(--fs-small);
+    line-height: 1.5;
+    color: var(--grey);
+    margin: 0;
+    padding-left: 17px;
+  }
+
+  .info-card li + li { margin-top: 6px; }
+
+  @media (max-width: 640px) {
+    .info-cards.is-two { grid-template-columns: 1fr; }
+  }
+
+  /* ---- collapsible reflection items (native details, so keyboard works free) ---- */
+  .reveal { border-bottom: 1px solid var(--rule); }
+  .reveal:last-child { border-bottom: none; }
+
+  .reveal summary {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    padding: 12px 0;
+    font-size: var(--fs-body);
+    line-height: 1.5;
+    color: var(--grey);
+    cursor: pointer;
+    list-style: none;
+    transition: color 0.2s ease;
+  }
+
+  /* hide the default disclosure triangle in every engine */
+  .reveal summary::-webkit-details-marker { display: none; }
+  .reveal summary::marker { content: ""; }
+
+  .reveal summary:hover,
+  .reveal summary:focus-visible { color: var(--ink); }
+
+  .reveal-icon {
+    flex: 0 0 auto;
+    width: 13px;
+    height: 13px;
+    margin-top: 0.2em;
+    color: var(--grey-dim);
+    transition: transform 0.2s ease;
+  }
+
+  .reveal-icon svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.6;
+  }
+
+  .reveal[open] .reveal-icon { transform: rotate(90deg); }
+
+  .reveal p {
+    margin: 0 0 14px;
+    padding-left: 23px;
+    font-size: var(--fs-body);
+    line-height: 1.6;
+    color: var(--grey);
+  }
+
+  /* ---- outcome comparison: same bar language as the rating chart ---- */
+  .result {
+    margin: var(--sp-label) 0;
+    border-top: 1px solid var(--rule);
+  }
+
+  .result-metric {
+    padding: 14px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .result-head {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 9px;
+  }
+
+  .result-name {
+    font-size: var(--fs-body);
+    color: var(--ink);
+  }
+
+  .result-delta {
+    font-size: var(--fs-small);
+    color: var(--ink);
+    background: var(--panel);
+    border-radius: 999px;
+    padding: 2px 10px;
+  }
+
+  .result-row {
+    display: grid;
+    grid-template-columns: 88px 1fr 40px;
+    align-items: center;
+    gap: 13px;
+    padding: 3px 0;
+  }
+
+  .result-who {
+    font-size: var(--fs-small);
+    color: var(--grey-dim);
+  }
+
+  .result-num {
+    font-size: var(--fs-small);
+    color: var(--ink);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* the control series stays lighter: a series colour, not a verdict */
+  .chart-fill.is-control { background: var(--grey-line); }
+
+  @media (max-width: 480px) {
+    .result-row { grid-template-columns: 74px 1fr 36px; }
+  }
+
+  /* ---- star rating: two stacked rows of five, the filled one clipped to the score ---- */
+  .stars {
+    position: relative;
+    display: inline-block;
+    /* shrink to the stars themselves: as a stretched grid item the clip
+       percentage would be measured against the whole column */
+    justify-self: start;
+    width: max-content;
+    line-height: 0;
+  }
+
+  .stars-base,
+  .stars-fill {
+    display: flex;
+    gap: 3px;
+  }
+
+  .stars-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .stars svg {
+    flex: 0 0 auto;
+    width: 15px;
+    height: 15px;
+  }
+
+  .stars-base svg {
+    fill: none;
+    stroke: var(--grey-line);
+    stroke-width: 1.6;
+  }
+
+  .stars-fill svg {
+    fill: var(--ink);
+    stroke: none;
+  }
+
+  /* ---- rating chart: built from page variables, not an embedded image ---- */
+  .chart { margin: var(--sp-label) 0; }
+
+  /* only as wide as label, stars and score need, then centred: stretching to the
+     full measure left ~290px of dead space between the stars and the number */
+  .chart-rows {
+    width: max-content;
+    max-width: 100%;
+    margin: 0 auto;
+    border-top: 1px solid var(--rule);
+  }
+
+  .chart-row {
+    display: grid;
+    grid-template-columns: 132px auto 40px;
+    align-items: center;
+    gap: 13px;
+    padding: 11px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .chart-label {
+    font-size: var(--fs-small);
+    color: var(--grey);
+  }
+
+  .chart-track {
+    position: relative;
+    height: 8px;
+    background: var(--panel);
+    border-radius: 999px;
+  }
+
+  .chart-fill {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    background: var(--ink);
+    border-radius: 999px;
+  }
+
+  .chart-value {
+    font-size: var(--fs-small);
+    color: var(--ink);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .chart figcaption { margin-top: 12px; }
+
+  @media (max-width: 480px) {
+    .chart-row {
+      grid-template-columns: 104px auto 36px;
+      gap: 10px;
+    }
+  }
+
+  /* ---- rating chart ends ---- */
+
+  /* ---- wide diagram: same 814px bleed as the structure box so they align ---- */
+  .wide-shot {
+    width: 100%;
+    margin: var(--sp-section) 0 0;
+  }
+
+  .wide-shot a {
+    display: block;
+    line-height: 0;
+  }
+
+  .wide-shot img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    background: var(--bg);
+  }
+
+
+  /* ---- course structure box ---- */
+  .structure { margin: var(--sp-label) 0 var(--sp-section); }
+
+  .structure-box {
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    padding: 18px;
+  }
+
+  .structure-phase {
+    display: block;
+    font-size: var(--fs-small);
+    color: var(--grey-dim);
+    margin-bottom: 9px;
+  }
+
+  .structure-box .modules { margin-top: 0; }
+  .structure-box .modules + .structure-phase { margin-top: 18px; }
+
+  /* inner cards drop their outline so the enclosing box reads as one unit */
+  .structure-box .module {
+    border-color: transparent;
+    background: var(--panel);
+  }
+
+  /* ---- three-stage flow: horizontal, held to the body measure ---- */
+  .stages {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr auto 1fr;
+    align-items: stretch;
+    margin-top: var(--sp-label);
+  }
+
+  .stage {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    padding: 13px;
+  }
+
+  .stage-head {
+    display: flex;
+    align-items: baseline;
+    gap: 7px;
+  }
+
+  .stage-n {
+    font-size: var(--fs-small);
+    color: var(--grey-dim);
+  }
+
+  .stage h4 {
+    font-size: var(--fs-body);
+    font-weight: 400;
+    color: var(--ink);
+    margin: 0;
+    letter-spacing: -0.005em;
+  }
+
+  .stage-sub {
+    font-size: var(--fs-small);
+    line-height: 1.45;
+    color: var(--grey);
+    margin: 5px 0 0;
+  }
+
+  .stage-eg {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--rule);
+  }
+
+  .stage-eg span {
+    display: block;
+    font-size: var(--fs-small);
+    color: var(--grey-dim);
+    margin-bottom: 2px;
+  }
+
+  .stage-eg p {
+    font-size: var(--fs-small);
+    line-height: 1.45;
+    color: var(--grey);
+    margin: 0;
+  }
+
+  .stage-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    color: var(--grey-dim);
+  }
+
+  .stage-link svg {
+    width: 14px;
+    height: 14px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+  }
+
+  /* too narrow for three across: stack and turn the arrows downward */
+  @media (max-width: 700px) {
+    .stages { grid-template-columns: 1fr; }
+    .stage-link {
+      width: auto;
+      padding: 8px 0;
+    }
+    .stage-link svg { transform: rotate(90deg); }
+  }
+
+  /* ---- module cards ---- */
+  .modules {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: var(--sp-label);
+  }
+
+  .module {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    padding: 16px;
+  }
+
+  .module-n {
+    display: block;
+    font-size: var(--fs-small);
+    color: var(--grey-dim);
+    line-height: 1;
+    margin-bottom: 7px;
+  }
+
+  .module h4 {
+    font-size: var(--fs-body);
+    font-weight: 400;
+    color: var(--ink);
+    margin: 0 0 5px;
+    letter-spacing: -0.005em;
+  }
+
+  .module p {
+    font-size: var(--fs-small);
+    line-height: 1.5;
+    color: var(--grey);
+    margin: 0;
+  }
+
+  /* ---- clickable module card ---- */
+  .module-open {
+    font: inherit;
+    text-align: left;
+    width: 100%;
+    background: var(--panel);
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+  }
+
+  .structure-box .module-open { border-color: var(--rule); }
+
+  .structure-box .module-open:hover,
+  .module-open:focus-visible { border-color: var(--grey-line); }
+
+  .module-cue {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    /* auto margin pins it to the card floor, so the cue lines up across a row
+       even when the descriptions differ in length; padding keeps a minimum gap */
+    margin-top: auto;
+    padding-top: 12px;
+    font-size: var(--fs-small);
+    color: var(--grey-dim);
+    transition: color 0.2s ease;
+  }
+
+  .module-open:hover .module-cue,
+  .module-open:focus-visible .module-cue { color: var(--ink); }
+
+  .module-cue svg {
+    width: 12px;
+    height: 12px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+  }
+
+  /* ---- lesson screens dialog: overlay, so it can be far wider than the column ---- */
+  .screens[open] {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .screens {
+    width: min(1060px, 88vw);
+    height: min(78vh, 720px);
+    padding: 0;
+    background: var(--bg);
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    color: var(--ink);
+    overflow: hidden;
+  }
+
+  .screens::backdrop { background: rgba(0, 0, 0, 0.45); }
+
+  .screens-bar {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 13px 18px;
+    border-bottom: 1px solid var(--rule);
+    background: var(--bg);
+  }
+
+  .screens-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px 5px 6px;
+    font: inherit;
+    font-size: var(--fs-small);
+    color: var(--grey);
+    background: none;
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: color 0.2s ease, border-color 0.2s ease;
+  }
+
+  .screens-back:hover {
+    color: var(--ink);
+    border-color: var(--grey-line);
+  }
+
+  .screens-back svg {
+    width: 13px;
+    height: 13px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+  }
+
+  .screens-title {
+    font-size: var(--fs-small);
+    color: var(--grey-dim);
+  }
+
+  /* one screen at a time, sized to the box: nothing here should ever scroll */
+  .screens-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 18px;
+    overflow: hidden;
+  }
+
+  .screens-intro {
+    flex: 0 0 auto;
+    margin: 0 0 14px;
+    font-size: var(--fs-small);
+    line-height: 1.5;
+    color: var(--grey);
+  }
+
+  .screens-page {
+    display: none;
+    margin: 0;
+    flex-direction: column;
+  }
+
+  /* flex rather than height:100%, so the intro line above it takes its share
+     and the picture shrinks to fit instead of forcing a scrollbar */
+  .screens-page.is-current {
+    display: flex;
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+
+  .screens-frame {
+    position: relative;
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* half-width click targets over the picture, the usual lightbox gesture */
+  .screens-side {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 50%;
+    display: flex;
+    align-items: center;
+    padding: 0 14px;
+    background: none;
+    border: 0;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  .screens-side-prev {
+    left: 0;
+    justify-content: flex-start;
+  }
+
+  .screens-side-next {
+    right: 0;
+    justify-content: flex-end;
+  }
+
+  /* the cue only appears on the side that can actually go somewhere */
+  .screens-side:hover:not(:disabled),
+  .screens-side:focus-visible:not(:disabled) { opacity: 1; }
+  .screens-side:disabled { cursor: default; }
+
+  .screens-side span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 1px solid var(--rule);
+    color: var(--ink);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  }
+
+  .screens-side svg {
+    width: 15px;
+    height: 15px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+  }
+
+  /* max-width and max-height together let the image find its own fit, and the
+     border hugs the picture rather than an oversized box */
+  .screens-frame img {
+    display: block;
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+  }
+
+  .screens-page figcaption {
+    flex: 0 0 auto;
+    margin-top: 13px;
+    text-align: left;
+  }
+
+  .screens-nav {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-left: auto;
+  }
+
+  .screens-count {
+    font-size: var(--fs-small);
+    color: var(--grey-dim);
+    font-variant-numeric: tabular-nums;
+  }
+
+
+
+  @media (max-width: 640px) {
+    .modules { grid-template-columns: 1fr; }
+  }
+
+  /* ---- insight -> response table, held to the body measure ---- */
+  .mapping {
+    width: 100%;
+    margin: 0 0 var(--sp-label);
+    border-collapse: collapse;
+    table-layout: fixed;
+  }
+
+  .mapping th {
+    text-align: left;
+    font-size: var(--fs-small);
+    font-weight: 400;
+    color: var(--grey-dim);
+    padding: 0 16px 9px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .mapping td {
+    vertical-align: top;
+    font-size: var(--fs-body);
+    line-height: 1.5;
+    color: var(--grey);
+    padding: 14px 16px 14px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .mapping td:first-child { color: var(--ink); }
+  .mapping th:last-child,
+  .mapping td:last-child { padding-right: 0; }
+  .mapping tr:last-child td { border-bottom: none; }
+
+  .mapping col.c-frustration { width: 44%; }
+  .mapping col.c-response { width: 56%; }
+
+  @media (max-width: 1100px) {
+    .mapping,
+    .mapping tbody,
+    .mapping tr,
+    .mapping td {
+      display: block;
+      width: 100%;
+    }
+    .mapping { margin-left: 0; margin-right: 0; }
+    .mapping thead { display: none; }
+    .mapping tr {
+      padding: 16px 0;
+      border-bottom: 1px solid var(--rule);
+    }
+    .mapping tr:last-child { border-bottom: none; }
+    .mapping td {
+      padding: 0 0 9px;
+      border-bottom: none;
+    }
+    .mapping tr td:last-child { padding-bottom: 0; }
+    .mapping td::before {
+      content: attr(data-label);
+      display: block;
+      font-size: var(--fs-small);
+      color: var(--grey-dim);
+      margin-bottom: 1px;
+    }
+  }
+
+
+  figcaption {
+    margin-top: 12px;
+    font-size: var(--fs-small);
+    color: var(--grey-dim);
+    text-align: center;
+  }
+
+  blockquote {
+    margin: var(--sp-label) 0;
+    padding-left: 20px;
+    border-left: 1px solid var(--rule);
+    font-size: var(--fs-body);
+    line-height: 1.6;
+    color: var(--grey);
+  }
+
+  blockquote cite {
+    display: block;
+    margin-top: 8px;
+    font-size: var(--fs-small);
+    font-style: normal;
+    color: var(--grey-dim);
+  }
+
+  /* ---- end-of-page pager: previous, home, next ---- */
+  .pager {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 18px;
+    border-top: 1px solid var(--rule);
+    padding-top: var(--sp-label);
+    margin-top: var(--sp-intro);
+  }
+
+  .pager .k {
+    display: block;
+    font-size: var(--fs-small);
+    color: var(--grey-dim);
+    margin-bottom: 8px;
+  }
+
+  .pager-prev { text-align: left; }
+  .pager-next { text-align: right; }
+
+  /* an empty side still has to hold its column so the ball stays centred */
+  .pager-prev:empty, .pager-next:empty { min-height: 1px; }
+
+  .pager-home {
+    display: block;
+    width: var(--mark-size);
+    height: var(--mark-size);
+    transition: transform 0.2s ease;
+  }
+
+  .pager-home svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .pager-home:hover { transform: translateY(-3px); }
+
+  @media (max-width: 420px) {
+    .pager { gap: 12px; }
+  }
+
+  a:focus-visible, button:focus-visible {
+    outline: 2px solid var(--grey);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;   /* ← add this */
+  max-width: 560px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 16px var(--gutter) 24px;
+  font-size: var(--fs-footer);
+}
+
+  .copyright { color: var(--grey-dim); }
+
+  @media (max-width: 480px) {
+    .page { padding: var(--sp-top) clamp(20px, 8vw, 40px) 0; }
+    footer { padding: 14px clamp(20px, 8vw, 40px) 20px; }
+  }
+</style>
+</head>
+<body>
+  <div class="page">
+    <div class="content">
+      <a class="mark-link" href="index.html" aria-label="Back to home">
+        <span class="mark-ball">
+          <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <circle cx="20" cy="20" r="19" fill="var(--tennis)"/>
+            <g fill="none" stroke="var(--seam)" stroke-width="2" stroke-linecap="round">
+              <path d="M6 7c8 7 8 19 0 26"/>
+              <path d="M34 7c-8 7-8 19 0 26"/>
+            </g>
+          </svg>
+        </span>
+        <span class="mark-back">
+          <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <circle cx="20" cy="20" r="19" fill="var(--ink)"/>
+            <g fill="none" stroke="var(--bg)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M26 20H15"/>
+              <path d="M19.5 15.5 15 20l4.5 4.5"/>
+            </g>
+          </svg>
+        </span>
+        <span class="mark-label">Back</span>
+      </a>
+
+      <h1>AI-Assisted Accounting Introduction Pedagogy Design</h1>
+      <p class="deck"><strong>Yale School of Management.</strong> Rebuilt the accounting pre-work around a single business scenario and an AI tutor, so students reason their way to the concepts instead of memorizing them.</p>
+
+      <div class="stats">
+        <div><span class="stat-n">41%</span><span class="stat-l">fewer mistakes with the tutor</span></div>
+        <div><span class="stat-n">350+</span><span class="stat-l">students a year once it launches</span></div>
+      </div>
+
+      <figure>
+        <div class="device">
+          <div class="device-screen">
+            <img src="./images/course-overview.png" alt="The course site open in a browser: the Laying It Out lesson on the left, building a cash-flow statement in a spreadsheet, with the Danny AI tutor panel docked on the right offering quick-ask questions.">
+          </div>
+          <div class="device-base"></div>
+        </div>
+        <figcaption>The redesigned course, with Danny the AI tutor alongside each lesson.</figcaption>
+      </figure>
+
+      <div class="meta">
+        <div><span class="k">Role</span><span class="v">Learning Engineer - Research Lead</span></div>
+        <div><span class="k">Timeline</span><span class="v">January to July 2026</span></div>
+      </div>
+
+      <section id="overview">
+        <h2>Overview</h2>
+        <p>Yale's accounting pre-work course prepares 350+ incoming MBA and EMBA students each year before they begin their core coursework. Our team redesigned the course content and developed an AI tutor. I led the research: user studies, literature review, and rounds of testing that fed each iteration and kept design decisions tied to what learners actually did rather than what we assumed.</p>
+      </section>
+
+      <section id="problem">
+        <h2>Problem</h2>
+        <p>Two concerns started the project: a curriculum still built around bookkeeping mechanics, and students reaching for AI in ways that skip the learning.</p>
+
+      <figure>
+        <div class="shot">
+          <img src="./images/course-before.png" alt="The original Yale accounting pre-work course on Canvas, with a lecture video embedded in the page.">
+        </div>
+        <figcaption>The original course is presented on Canvas, instructed by texts and videos.</figcaption>
+      </figure>
+
+        <p>The user study combined post-course survey analysis of 1,279 respondents and interviews with two past learners to define who we are designing for and what improvements the current course needs.</p>
+
+        <div class="personas" data-gallery="persona" role="group" aria-roledescription="carousel" aria-label="Personas">
+          <div class="gal-stage">
+            <div class="personas-viewport" data-viewport>
+              <div class="personas-track" data-track>
+              <div class="persona" data-slide role="group" aria-roledescription="slide" aria-label="1 of 2">
+                <h4>Accounting Novice</h4>
+                <p class="note">Composite, grounded in our student interview</p>
+                <div class="tags">
+                  <span>MBA</span>
+                  <span>No accounting background</span>
+                  <span>Studies at night</span>
+                </div>
+                <p><span class="k">Goals</span>Learn accounting from zero and keep momentum while studying at night.</p>
+                <p><span class="k">Pain Points</span>Course feedback marks answers wrong without ever explaining why.</p>
+                <p class="quote">&ldquo;I want feedback that tells me why, not just if I&rsquo;m right.&rdquo;</p>
+              </div>
+
+              <div class="persona" data-slide role="group" aria-roledescription="slide" aria-label="2 of 2">
+                <h4>Business Veteran</h4>
+                <p class="note">Composite, grounded in our student interview</p>
+                <div class="tags">
+                  <span>EMBA</span>
+                  <span>Patchy recall</span>
+                  <span>Studies between work</span>
+                </div>
+                <p><span class="k">Goals</span>Refresh the right concepts fast, with help that knows where he stands.</p>
+                <p><span class="k">Pain Points</span>No quick way to spot which fundamentals have quietly rusted.</p>
+                <p class="quote">&ldquo;AI could remind me about the marginal concepts, when a professor isn&rsquo;t easily accessible online.&rdquo;</p>
+              </div>
+              </div>
+            </div>
+
+            <button type="button" class="gal-arrow gal-arrow-prev" data-prev aria-label="Previous persona">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <button type="button" class="gal-arrow gal-arrow-next" data-next aria-label="Next persona">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          </div>
+
+          <div class="gal-controls">
+            <div class="gal-dots" data-dots></div>
+          </div>
+        </div>
+
+        <details class="reveal reveal-block">
+          <summary><span class="reveal-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Mapping Research Frustrations to Design Solutions</summary>
+          <table class="mapping">
+            <colgroup>
+              <col class="c-frustration">
+              <col class="c-response">
+            </colgroup>
+            <thead>
+              <tr>
+                <th scope="col">Frustrations</th>
+                <th scope="col">Design Response</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td data-label="Frustrations">Both interviewees named the same problem: concepts that quietly stay broken.</td>
+                <td data-label="Design Response">Practice checkpoints run throughout the course, feeding a misconception model the AI tutor keeps for each student.</td>
+              </tr>
+              <tr>
+                <td data-label="Frustrations">The top requested fix in the survey: explain why my answer was wrong.</td>
+                <td data-label="Design Response">The AI tutor reads the question context alongside the student's answer, then explains the gap in the same terms the module used.</td>
+              </tr>
+              <tr>
+                <td data-label="Frustrations">Students pick up the terms without seeing how the statements connect.</td>
+                <td data-label="Design Response">Each concept arrives inside a scenario, showing where the number comes from and what decision it informs.</td>
+              </tr>
+            </tbody>
+          </table>
+        </details>
+      </section>
+
+      <section id="solution">
+        <h2>Solution</h2>
+        <h3>Instructional Design</h3>
+        <figure class="structure">
+          <div class="structure-box">
+            <span class="structure-phase">Discovery</span>
+            <div class="modules">
+              <button type="button" class="module module-open" data-open-screens="module-1-screens" aria-haspopup="dialog">
+                <span class="module-n">01</span>
+                <h4>The Journey</h4>
+                <span class="module-cue">View the lesson screens
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+              </button>
+              <button type="button" class="module module-open" data-open-screens="module-2-screens" aria-haspopup="dialog">
+                <span class="module-n">02</span>
+                <h4>Getting Formal</h4>
+                <span class="module-cue">View the lesson screens
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+              </button>
+              <button type="button" class="module module-open" data-open-screens="module-3-screens" aria-haspopup="dialog">
+                <span class="module-n">03</span>
+                <h4>The Story Between the Snapshots</h4>
+                <span class="module-cue">View the lesson screens
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+              </button>
+              <button type="button" class="module module-open" data-open-screens="module-4-screens" aria-haspopup="dialog">
+                <span class="module-n">04</span>
+                <h4>The Angel Investor</h4>
+                <span class="module-cue">View the lesson screens
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+              </button>
+            </div>
+            <span class="structure-phase">Transfer</span>
+            <div class="modules">
+              <div class="module">
+                <span class="module-n">05 (Coming Soon)</span>
+                <h4>Real Statements</h4>
+              </div>
+              <div class="module">
+                <span class="module-n">06 (Coming Soon)</span>
+                <h4>Nonprofit Statements</h4>
+              </div>
+            </div>
+          </div>
+          <figcaption>Redesigned course structure</figcaption>
+        </figure>
+        <dialog class="screens" id="module-1-screens" aria-label="Module 1 lesson screens">
+          <div class="screens-bar">
+            <button type="button" class="screens-back" data-close-screens>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Back
+            </button>
+            <span class="screens-title">Module 01 &middot; The Journey</span>
+            <div class="screens-nav">
+              <span class="screens-count" data-screen-count>1 / 2</span>
+            </div>
+          </div>
+          <div class="screens-body">
+            <p class="screens-intro">Begins with a bike-repair job still tangled up in personal life. Sorting through the records draws a boundary around the repair work, and it starts to be treated as an accounting entity.</p>
+            <figure class="screens-page">
+              <div class="screens-frame">
+                <button type="button" class="screens-side screens-side-prev" data-screen-prev aria-label="Previous screen">
+                  <span><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                </button>
+                <img src="./images/module1-bank-statement.png" alt="Lesson screen 1.3, The Bank Statement. Anna asks the student to decide, row by row, whether each transaction belongs with the repair work or with their personal life, with running counts of 2 repair-related, 0 personal and 16 unsorted.">
+                <button type="button" class="screens-side screens-side-next" data-screen-next aria-label="Next screen">
+                  <span><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                </button>
+              </div>
+              <figcaption>1.3 &middot; Students sort real transactions into repair work or personal life, drawing the entity boundary before the term for it exists.</figcaption>
+            </figure>
+            <figure class="screens-page">
+              <div class="screens-frame">
+                <button type="button" class="screens-side screens-side-prev" data-screen-prev aria-label="Previous screen">
+                  <span><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                </button>
+                <img src="./images/module1-keeping-the-reasons.png" alt="Lesson screen 1.4, Why Keep the Reasons. An assets sheet totalling 3,410 dollars, with Anna pointing out that a list of totals cannot explain how the numbers got there.">
+                <button type="button" class="screens-side screens-side-next" data-screen-next aria-label="Next screen">
+                  <span><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                </button>
+              </div>
+              <figcaption>1.4 &middot; The lists keep changing, and totals alone never say why. That gap is what motivates keeping the reasons, not just the balances.</figcaption>
+            </figure>
+          </div>
+        </dialog>
+
+        <dialog class="screens" id="module-2-screens" aria-label="Module 2 lesson screens">
+          <div class="screens-bar">
+            <button type="button" class="screens-back" data-close-screens>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Back
+            </button>
+            <span class="screens-title">Module 02 &middot; Getting Formal</span>
+            <div class="screens-nav">
+              <span class="screens-count" data-screen-count>1 / 2</span>
+            </div>
+          </div>
+          <div class="screens-body">
+            <p class="screens-intro">Formalizes the repair work as a business by establishing an LLC, adding a separate legal body to an accounting entity that already exists.</p>
+            <figure class="screens-page">
+              <div class="screens-frame">
+                <button type="button" class="screens-side screens-side-prev" data-screen-prev aria-label="Previous screen">
+                  <span><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                </button>
+                <img src="./images/module2-who-sees-two.png" alt="Lesson screen 2.1, Who Sees Two? Students drag cards for their books, the bank, the credit-card company, Smith the customer, and the law into zones, deciding which of them treats the bike-repair role as separate from the rest of their life.">
+                <button type="button" class="screens-side screens-side-next" data-screen-next aria-label="Next screen">
+                  <span><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                </button>
+              </div>
+              <figcaption>2.1 &middot; Each party is tested in turn: does this one see the repair work as separate? The accounting boundary holds in the books but not in the eyes of the law.</figcaption>
+            </figure>
+            <figure class="screens-page">
+              <div class="screens-frame">
+                <button type="button" class="screens-side screens-side-prev" data-screen-prev aria-label="Previous screen">
+                  <span><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                </button>
+                <img src="./images/module2-file-the-certificate.png" alt="Lesson screen 2.2, File the Certificate. Connecticut’s Certificate of Organization for the student’s bike repair LLC, with a button to file it with the state.">
+                <button type="button" class="screens-side screens-side-next" data-screen-next aria-label="Next screen">
+                  <span><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                </button>
+              </div>
+              <figcaption>2.2 &middot; Filing the Certificate of Organization is the moment a separate legal body appears, layered onto an accounting entity that already existed.</figcaption>
+            </figure>
+          </div>
+        </dialog>
+
+        <dialog class="screens" id="module-3-screens" aria-label="Module 3 lesson screens">
+          <div class="screens-bar">
+            <button type="button" class="screens-back" data-close-screens>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Back
+            </button>
+            <span class="screens-title">Module 03 &middot; The Story Between the Snapshots</span>
+            <div class="screens-nav">
+              <span class="screens-count" data-screen-count>1 / 2</span>
+            </div>
+          </div>
+          <div class="screens-body">
+            <p class="screens-intro">Turns to how detailed records are organized to explain a business's financial performance across a chosen period of time.</p>
+            <figure class="screens-page">
+              <div class="screens-frame">
+                <button type="button" class="screens-side screens-side-prev" data-screen-prev aria-label="Previous screen">
+                  <span><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                </button>
+                <img src="./images/module3-read-the-books.png" alt="Lesson screen 3.1, Read the Books. An assets sheet where every category ends in a ruled balance dated August 31, with Anna asking where Parts stood on June 1, and a two-option check asking whether the June 1 balance is visible or only the August 31 balances are.">
+                <button type="button" class="screens-side screens-side-next" data-screen-next aria-label="Next screen">
+                  <span><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                </button>
+              </div>
+              <figcaption>3.1 &middot; Every category ends in a balance for today, and none of them says where things stood when the season opened. That missing line is the point.</figcaption>
+            </figure>
+            <figure class="screens-page">
+              <div class="screens-frame">
+                <button type="button" class="screens-side screens-side-prev" data-screen-prev aria-label="Previous screen">
+                  <span><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                </button>
+                <img src="./images/module3-what-cash-missed.png" alt="Lesson screen 3.4, What Cash Missed. The liabilities sheet with the credit card expanded into its individual charges, Anna explaining that the 2,030 dollar payoff settled an existing debt rather than creating an expense, and a running bridge panel starting from 2,640 dollars of net income.">
+                <button type="button" class="screens-side screens-side-next" data-screen-next aria-label="Next screen">
+                  <span><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                </button>
+              </div>
+              <figcaption>3.4 &middot; Paying off the card settles a debt from June 1 without creating an expense, which is precisely where cash and income part company.</figcaption>
+            </figure>
+          </div>
+        </dialog>
+
+        <dialog class="screens" id="module-4-screens" aria-label="Module 4 lesson screens">
+          <div class="screens-bar">
+            <button type="button" class="screens-back" data-close-screens>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Back
+            </button>
+            <span class="screens-title">Module 04 &middot; The Angel Investor</span>
+            <div class="screens-nav">
+              <span class="screens-count" data-screen-count>1 / 2</span>
+            </div>
+          </div>
+          <div class="screens-body">
+            <p class="screens-intro">Draws the earlier concepts together, showing how the financial statements connect into a comprehensive view of a business's financial health.</p>
+            <figure class="screens-page">
+              <div class="screens-frame">
+                <button type="button" class="screens-side screens-side-prev" data-screen-prev aria-label="Previous screen">
+                  <span><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                </button>
+                <img src="./images/module4-laying-it-out.png" alt="Lesson screen 4.4, Laying It Out. A cash-flow statement assembled in the working tab, grouped into operating, investing and financing activities and reconciling cash from 1,300 dollars on June 1 to 620 on August 31, with a button to christen it the Cash Flow Statement.">
+                <button type="button" class="screens-side screens-side-next" data-screen-next aria-label="Next screen">
+                  <span><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                </button>
+              </div>
+              <figcaption>4.4 &middot; The cash-flow statement gets grouped and totalled into operating, investing and financing, then reconciled back to the cash on hand.</figcaption>
+            </figure>
+            <figure class="screens-page">
+              <div class="screens-frame">
+                <button type="button" class="screens-side screens-side-prev" data-screen-prev aria-label="Previous screen">
+                  <span><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                </button>
+                <img src="./images/module4-statements-tie-out.png" alt="Lesson screen 4.5, The Statements Tie Out. The opening and closing balance sheets sit side by side while the student picks which statement explains the 2,040 dollar rise in Member’s Capital.">
+                <button type="button" class="screens-side screens-side-next" data-screen-next aria-label="Next screen">
+                  <span><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                </button>
+              </div>
+              <figcaption>4.5 &middot; Two balance sheets, side by side, and for each change between them the student names the statement that accounts for it.</figcaption>
+            </figure>
+          </div>
+        </dialog>
+
+        <p>The new pre-work introduces accounting not as a set of definitions and rules to memorize, but as something built through a single business scenario: opening a bike repair shop.</p>
+
+
+
+        <p>The target learning outcome is a transferable mental model of accounting as an information system that arises from the needs of a business, one that scales across different organizations and economic events.</p>
+        <p>To get there, we inverted the usual order. Instead of defining a concept and then applying it, each module opens with a situation the student has to reason about before they have the vocabulary for it. The shop carries across the first four modules, so each new concept attaches to a business the student already understands rather than a fresh abstract example.</p>
+        <p>Within Discovery, every module is built on the same three-stage model: Experience, then Discover, then Formalize. The sequence draws on research-based instructional design strategies, including <a class="link" href="https://doi.org/10.3200/JOEB.81.4.221-224" target="_blank" rel="noopener noreferrer">problem-based learning</a>, <a class="link" href="https://onlinelibrary.wiley.com/doi/full/10.1155/2020/6690082" target="_blank" rel="noopener noreferrer">guided discovery</a>, and <a class="link" href="https://openurl.ebsco.com/EPDB%3Agcd%3A8%3A21499592/detailv2?sid=ebsco%3Aplink%3Ascholar-a&amp;id=ebsco%3Agcd%3A182172858&amp;crl=c&amp;jrnl=19450915" target="_blank" rel="noopener noreferrer">scaffolding</a>.</p>
+
+        <div class="stages">
+          <div class="stage">
+            <div class="stage-head">
+              <span class="stage-n">01</span>
+              <h4>Experience</h4>
+            </div>
+            <p class="stage-sub">Entering the story without knowing the end.</p>
+            <div class="stage-eg">
+              <span>In Module 1</span>
+              <p>The side gig has grown too tangled to track from memory.</p>
+            </div>
+          </div>
+
+          <div class="stage-link" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+
+          <div class="stage">
+            <div class="stage-head">
+              <span class="stage-n">02</span>
+              <h4>Discover</h4>
+            </div>
+            <p class="stage-sub">Building the accounting logic step by step.</p>
+            <div class="stage-eg">
+              <span>In Module 1</span>
+              <p>Students sort what belongs in the records into Things or Promises.</p>
+            </div>
+          </div>
+
+          <div class="stage-link" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+
+          <div class="stage">
+            <div class="stage-head">
+              <span class="stage-n">03</span>
+              <h4>Formalize</h4>
+            </div>
+            <p class="stage-sub">Naming the emerging ideas in conventional accounting language.</p>
+            <div class="stage-eg">
+              <span>In Module 1</span>
+              <p>The accounting entity arrives, with assets and liabilities.</p>
+            </div>
+          </div>
+        </div>
+
+
+        <h3>AI Tutor Design</h3>
+        <p>Most of these students are new to accounting, and the pre-work runs online before the semester begins, so no instructor is on hand at the moment someone gets stuck.</p>
+
+        <div class="features" data-gallery="feature" data-center role="group" aria-roledescription="carousel" aria-label="AI tutor features">
+          <div class="gal-stage">
+            <div class="features-viewport" data-viewport>
+              <div class="features-track" data-track>
+              <div class="feature" data-slide role="group" aria-roledescription="slide" aria-label="1 of 6">
+                <div class="feature-shot">
+                  <img src="./images/feature-1.png" alt="The Getting Started lesson page, with the rest of the screen faded back so the docked tutor stands out in the bottom right corner: an Ask Danny button with a tooltip above it reading are you stuck on this.">
+                </div>
+                <div class="feature-caption">
+                  <h4>Trigger Everywhere</h4>
+                  <p>Students can ask Danny a question at any point, anywhere in the course. Danny opens in a sidebar with quick-ask prompts to get them started.</p>
+                </div>
+              </div>
+
+              <div class="feature" data-slide role="group" aria-roledescription="slide" aria-label="2 of 6">
+                <div class="feature-shot">
+                  <img src="./images/feature-2.png" alt="The Sort Your Things lesson with the Danny panel open alongside it. Asked to explain the activity, Danny answers by naming that exact lesson and its Things tab, then lists what belongs there, without the student having said where they were.">
+                </div>
+                <div class="feature-caption">
+                  <h4>Auto-Synced Context</h4>
+                  <p>Danny already knows which lesson the student is on and whether they answered the last question correctly, so nothing has to be explained twice.</p>
+                </div>
+              </div>
+
+              <div class="feature" data-slide role="group" aria-roledescription="slide" aria-label="3 of 6">
+                <div class="feature-shot">
+                  <img src="./images/feature-3.png" alt="The Learning Progress panel for Module 1, with the rest of the screen faded back. The Line You Drew carries a warning icon and reads completed, 1 wrong, a What to revisit note names the missed question, and the highlighted Ask for Danny's Help button sits alongside it.">
+                </div>
+                <div class="feature-caption">
+                  <h4>Immediate Help With Errors</h4>
+                  <p>A wrong answer is marked with a button to get help on the spot. Danny&rsquo;s explanation arrives as an add-on to the activity&rsquo;s default feedback.</p>
+                </div>
+              </div>
+
+              <div class="feature" data-slide role="group" aria-roledescription="slide" aria-label="4 of 6">
+                <div class="feature-shot">
+                  <img src="./images/feature-4.png" alt="A chat exchange with Danny. The student asks how to save the chat to notes, and Danny answers with the steps: select Save as Note, which files an AI-generated summary rather than a word-for-word transcript, then carry on chatting, start a new chat, or reopen a recent one. Three suggested follow-up questions sit below.">
+                </div>
+                <div class="feature-caption">
+                  <h4>Need-Based Tutorial</h4>
+                  <p>Danny explains how the interface works when a student asks, one step at a time, and skips the parts the design already makes obvious.</p>
+                </div>
+              </div>
+
+              <div class="feature" data-slide role="group" aria-roledescription="slide" aria-label="5 of 6">
+                <div class="feature-shot">
+                  <img src="./images/feature-5.png" alt="A saved note titled Understanding Assets. It opens with a summary of what the session covered, tags three core concepts, lists three key learning points, and offers buttons to add it to saved notes or download the summary.">
+                </div>
+                <div class="feature-caption">
+                  <h4>Save to Notes</h4>
+                  <p>One click turns the conversation into a summary and files it in the student&rsquo;s notes for later review.</p>
+                </div>
+              </div>
+
+              <div class="feature" data-slide role="group" aria-roledescription="slide" aria-label="6 of 6">
+                <div class="feature-shot">
+                  <img src="./images/feature-6.png" alt="Two views of a call with Danny, stacked. Above, the call header with a running timer and an End call button, and Danny's spoken greeting shown as text. Below, Danny's avatar marked Connected, with Mute and Jump in controls.">
+                </div>
+                <div class="feature-caption">
+                  <h4>Call Mode</h4>
+                  <p>Students can speak to Danny and follow the transcript at the same time, and can cut in mid-response the way a real conversation works.</p>
+                </div>
+              </div>
+              </div>
+            </div>
+
+            <button type="button" class="gal-arrow gal-arrow-prev" data-prev aria-label="Previous feature">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <button type="button" class="gal-arrow gal-arrow-next" data-next aria-label="Next feature">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          </div>
+
+          <div class="gal-controls">
+            <div class="gal-dots" data-dots></div>
+          </div>
+        </div>
+
+
+        <h3>Dashboard Design</h3>
+        <p>To better understand how students perform, and to inform future iterations of the course, we designed an instructor dashboard.</p>
+        <details class="reveal reveal-block">
+          <summary><span class="reveal-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>What the dashboard shows</summary>
+          <ul>
+            <li><strong>Student learning data.</strong> Records attempts, answers, and mistakes.</li>
+            <li><strong>Difficulty ranking.</strong> Ranks pages and questions by where students go wrong, so instructors can see which parts of the course are hardest.</li>
+            <li><strong>Anonymous information.</strong> Accounts are created from an email roster, and learning patterns are never tied to names.</li>
+            <li><strong>Danny usage at a glance.</strong> Engagement counts, the text-versus-voice split, common question themes, and a cohort summary linking questions to the mistakes behind them.</li>
+            <li><strong>Knowledge base management.</strong> Refresh Danny&rsquo;s knowledge base in one click when content changes, and export everything to a spreadsheet.</li>
+          </ul>
+        </details>
+        <figure class="wide-shot">
+          <a href="./images/admin-dashboard.png" target="_blank" rel="noopener noreferrer" aria-label="Open the dashboard at full size">
+            <img src="./images/admin-dashboard.png" alt="The admin dashboard, subtitled progress and correctness, no PII. A cohort filter above seven summary tiles: 10 students, 4 started, 0 completed, 2 percent average completion, 60 percent correct rate, 15 minute median active time, 15 Danny chats. Below, a completion spread bar chart and per-module completion for all six modules, then collapsed panels for common mistakes, Danny insights, and Danny's knowledge base.">
+          </a>
+          <figcaption>The instructor view: cohort progress, per-module completion, and Danny usage, with no identifying information attached. Open it full size to read the detail.</figcaption>
+        </figure>
+      </section>
+
+
+      <section id="testing">
+        <h2>Testing</h2>
+        <p>We ran a controlled pilot with 31 participants in June 2026: 15 worked with the tutor, 16 without.</p>
+        <div class="result">
+          <div class="result-metric">
+            <div class="result-head">
+              <span class="result-name">Completed without errors</span>
+              <span class="result-delta">12% ahead</span>
+            </div>
+            <div class="result-row">
+              <span class="result-who">With Danny</span>
+              <span class="chart-track" aria-hidden="true"><span class="chart-fill" style="width: 100.0%"></span></span>
+              <span class="result-num">70%</span>
+            </div>
+            <div class="result-row">
+              <span class="result-who">Control</span>
+              <span class="chart-track" aria-hidden="true"><span class="chart-fill is-control" style="width: 82.9%"></span></span>
+              <span class="result-num">58%</span>
+            </div>
+          </div>
+          <div class="result-metric">
+            <div class="result-head">
+              <span class="result-name">First-try correct</span>
+              <span class="result-delta">11% ahead</span>
+            </div>
+            <div class="result-row">
+              <span class="result-who">With Danny</span>
+              <span class="chart-track" aria-hidden="true"><span class="chart-fill" style="width: 100.0%"></span></span>
+              <span class="result-num">97%</span>
+            </div>
+            <div class="result-row">
+              <span class="result-who">Control</span>
+              <span class="chart-track" aria-hidden="true"><span class="chart-fill is-control" style="width: 88.7%"></span></span>
+              <span class="result-num">86%</span>
+            </div>
+          </div>
+          <div class="result-metric">
+            <div class="result-head">
+              <span class="result-name">Avg. mistakes</span>
+              <span class="result-delta">41% fewer</span>
+            </div>
+            <div class="result-row">
+              <span class="result-who">With Danny</span>
+              <span class="chart-track" aria-hidden="true"><span class="chart-fill" style="width: 59.1%"></span></span>
+              <span class="result-num">3.9</span>
+            </div>
+            <div class="result-row">
+              <span class="result-who">Control</span>
+              <span class="chart-track" aria-hidden="true"><span class="chart-fill is-control" style="width: 100.0%"></span></span>
+              <span class="result-num">6.6</span>
+            </div>
+          </div>
+        </div>
+
+        <figure class="chart">
+          <div class="chart-rows">
+            <div class="chart-row">
+              <span class="chart-label">Overall Experience</span>
+              <span class="stars" aria-hidden="true">
+                <span class="stars-base">
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                </span>
+                <span class="stars-fill" style="width: 93.33%">
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                </span>
+              </span>
+              <span class="chart-value">4.67</span>
+            </div>
+            <div class="chart-row">
+              <span class="chart-label">Clarity</span>
+              <span class="stars" aria-hidden="true">
+                <span class="stars-base">
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                </span>
+                <span class="stars-fill" style="width: 94.67%">
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                </span>
+              </span>
+              <span class="chart-value">4.73</span>
+            </div>
+            <div class="chart-row">
+              <span class="chart-label">Usefulness</span>
+              <span class="stars" aria-hidden="true">
+                <span class="stars-base">
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                </span>
+                <span class="stars-fill" style="width: 92.0%">
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                </span>
+              </span>
+              <span class="chart-value">4.60</span>
+            </div>
+            <div class="chart-row">
+              <span class="chart-label">Confidence</span>
+              <span class="stars" aria-hidden="true">
+                <span class="stars-base">
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                </span>
+                <span class="stars-fill" style="width: 85.33%">
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                </span>
+              </span>
+              <span class="chart-value">4.27</span>
+            </div>
+            <div class="chart-row">
+              <span class="chart-label">Engagement</span>
+              <span class="stars" aria-hidden="true">
+                <span class="stars-base">
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                </span>
+                <span class="stars-fill" style="width: 92.0%">
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke-linejoin="round"/></svg>
+                </span>
+              </span>
+              <span class="chart-value">4.60</span>
+            </div>
+          </div>
+          <figcaption>Post-survey ratings from the AI tutor group, mean of 15 responses on a 1 to 5 scale.</figcaption>
+        </figure>
+
+
+        <blockquote>
+          The way this module is set up makes accounting seem less scary. It&rsquo;s kind of like storytelling. Not the usual way to study accounting, but it was really easy to follow along and kept me engaged.
+          <cite>Pilot participant, learner with prior business background</cite>
+        </blockquote>
+      </section>
+
+
+      <section id="impact">
+        <h2>Impact</h2>
+        <p>The work goes to the Dean of the Yale School of Management and to CMU's Tepper School of Business, with the course due to launch for Yale students next year and to inform how accounting courses are developed at Tepper.</p>
+
+        <div class="info-cards is-two">
+          <div class="info-card">
+            <h4>For learners</h4>
+            <p>Instead of passive videos explaining numbers and equations, the pre-work introduces every concept through a tangible, story-driven scenario. Learners from any background can follow the reasoning and reach core ideas like the accounting identity as a conclusion rather than a formula to memorize.</p>
+          </div>
+          <div class="info-card">
+            <h4>For teaching</h4>
+            <p>Because every activity and tutor conversation is captured in a shared database, instructors can see how students actually move through the material: where they hesitate, what they get wrong, and which concepts they bring to the tutor. Rather than a one-off deliverable, they get a working model they can develop further, with learning data to iterate against.</p>
+          </div>
+        </div>
+      </section>
+
+       <nav class="pager" aria-label="More work">
+        <div class="pager-prev">
+          <span class="k">Previous</span>
+          <a class="link" href="./X-Academy-en.html">X Academy</a>
+        </div>
+
+        <a class="pager-home" href="index.html" aria-label="Back to Home">
+          <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <circle cx="20" cy="20" r="19" fill="var(--tennis)"/>
+            <g fill="none" stroke="var(--seam)" stroke-width="2" stroke-linecap="round">
+              <path d="M6 7c8 7 8 19 0 26"/>
+              <path d="M34 7c-8 7-8 19 0 26"/>
+            </g>
+          </svg>
+        </a>
+      </nav>
+    </div>
+
+    <nav class="toc" aria-label="Sections">
+      <div class="toc-inner">
+        <a href="#overview">Overview</a>
+        <a href="#problem">Problem</a>
+        <a href="#solution">Solution</a>
+        <a href="#testing">Testing</a>
+        <a href="#impact">Impact</a>
+        <!-- <a href="#reflection">Reflection</a> -->
+      </div>
+    </nav>
+  </div>
+
+
+  <footer>
+    <span class="copyright">© 2026</span>
+  </footer>
+
+  <script>
+    /* section rail: highlight whichever section is currently in view */
+    const tocLinks = Array.from(document.querySelectorAll('.toc a'));
+    const sections = tocLinks
+      .map(link => document.querySelector(link.getAttribute('href')))
+      .filter(Boolean);
+
+    function setActive() {
+      const marker = window.innerHeight * 0.3;
+      let index = 0;
+      sections.forEach((section, i) => {
+        if (section.getBoundingClientRect().top <= marker) index = i;
+      });
+      // once the page is scrolled to the very bottom, favour the last section
+      if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 4) {
+        index = sections.length - 1;
+      }
+      tocLinks.forEach((link, i) => link.classList.toggle('active', i === index));
+    }
+
+    let queued = false;
+    function onScroll() {
+      if (queued) return;
+      queued = true;
+      requestAnimationFrame(() => { setActive(); queued = false; });
+    }
+
+    setActive();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+
+    /* module cards that open their lesson screens in an overlay */
+    document.querySelectorAll('[data-open-screens]').forEach(trigger => {
+      const dialog = document.getElementById(trigger.dataset.openScreens);
+      if (!dialog) return;
+
+      const pages = [...dialog.querySelectorAll('.screens-page')];
+      const count = dialog.querySelector('[data-screen-count]');
+      const stepPrev = [...dialog.querySelectorAll('[data-screen-prev]')];
+      const stepNext = [...dialog.querySelectorAll('[data-screen-next]')];
+      let page = 0;
+
+      function showPage(i) {
+        const wasFocused = document.activeElement;
+        page = Math.max(0, Math.min(i, pages.length - 1));
+        pages.forEach((el, n) => el.classList.toggle('is-current', n === page));
+        if (count) count.textContent = (page + 1) + ' / ' + pages.length;
+        stepPrev.forEach(b => { b.disabled = page === 0; });
+        stepNext.forEach(b => { b.disabled = page === pages.length - 1; });
+
+        /* paging to an end disables the control you just used, and the browser
+           then drops focus to <body>, outside the dialog. Catch it and hand
+           focus to whatever is still live. */
+        if (wasFocused && wasFocused.disabled) {
+          const live = [...stepPrev, ...stepNext].find(b => !b.disabled && b.offsetParent);
+          (live || dialog.querySelector('[data-close-screens]')).focus();
+        }
+      }
+
+      stepPrev.forEach(b => b.addEventListener('click', () => showPage(page - 1)));
+      stepNext.forEach(b => b.addEventListener('click', () => showPage(page + 1)));
+
+      /* bound to the document, not the dialog: a click can leave focus outside
+         the dialog, and a listener on the dialog would then never fire */
+      document.addEventListener('keydown', e => {
+        if (!dialog.open) return;
+        if (e.key === 'ArrowRight') { e.preventDefault(); showPage(page + 1); }
+        if (e.key === 'ArrowLeft') { e.preventDefault(); showPage(page - 1); }
+      });
+
+      trigger.addEventListener('click', () => {
+        showPage(0);
+        dialog.showModal();
+      });
+
+      dialog.querySelectorAll('[data-close-screens]').forEach(btn => {
+        btn.addEventListener('click', () => dialog.close());
+      });
+
+      /* clicking the backdrop counts as going back */
+      dialog.addEventListener('click', e => {
+        if (e.target === dialog) dialog.close();
+      });
+
+      /* send focus back to the card that opened it */
+      dialog.addEventListener('close', () => trigger.focus());
+    });
+
+    /* galleries: infinite loop, one slide at a time. Driven by data attributes so
+       the personas and the tutor features share this single implementation. */
+    document.querySelectorAll('[data-gallery]').forEach(gallery => {
+      const track = gallery.querySelector('[data-track]');
+      const real = Array.from(gallery.querySelectorAll('[data-slide]'));
+      const dotsBox = gallery.querySelector('[data-dots]');
+      const prev = gallery.querySelector('[data-prev]');
+      const next = gallery.querySelector('[data-next]');
+      const noun = gallery.dataset.gallery || 'item';
+      const n = real.length;
+      const centred = gallery.hasAttribute('data-center');
+      if (!track || n < 2) return;
+
+      /* Clone one slide onto each end so there is always a neighbour to peek at.
+         Land on a clone and we snap silently to its real twin, which is what makes
+         the loop seamless in both directions. */
+      const head = real[n - 1].cloneNode(true);
+      const tail = real[0].cloneNode(true);
+      [head, tail].forEach(clone => {
+        clone.removeAttribute('data-slide');
+        clone.setAttribute('data-clone', '');
+        clone.setAttribute('aria-hidden', 'true');
+        clone.querySelectorAll('a, button').forEach(el => { el.tabIndex = -1; });
+      });
+      track.insertBefore(head, real[0]);
+      track.appendChild(tail);
+
+      const items = Array.from(track.children);
+      let index = 0;   /* which real slide is showing */
+      let pos = 1;     /* which track position we are translated to */
+      let busy = false;
+
+      const dots = real.map((_, i) => {
+        const dot = document.createElement('button');
+        dot.type = 'button';
+        dot.setAttribute('aria-label', 'Show ' + noun + ' ' + (i + 1));
+        dot.addEventListener('click', () => {
+          if (busy || i === index) return;
+          index = i;
+          pos = i + 1;
+          render(true);
+        });
+        dotsBox.appendChild(dot);
+        return dot;
+      });
+
+      function step() {
+        const gap = parseFloat(getComputedStyle(track).columnGap) || 0;
+        return real[0].getBoundingClientRect().width + gap;
+      }
+
+      function render(animate) {
+        if (!animate) track.style.transition = 'none';
+        /* centred galleries pull back by half the leftover width, which puts the
+           active slide mid-viewport and reveals a sliver on both sides */
+        let offset = pos * step();
+        if (centred) {
+          const trackW = track.getBoundingClientRect().width;
+          const slideW = real[0].getBoundingClientRect().width;
+          offset -= (trackW - slideW) / 2;
+        }
+        track.style.transform = 'translateX(' + -offset + 'px)';
+        items.forEach((el, i) => el.classList.toggle('is-active', i === pos));
+        real.forEach((el, i) => {
+          const off = i !== index;
+          el.setAttribute('aria-hidden', String(off));
+          el.querySelectorAll('a, button').forEach(x => { x.tabIndex = off ? -1 : 0; });
+        });
+        dots.forEach((dot, i) => dot.setAttribute('aria-current', String(i === index)));
+        if (!animate) {
+          void track.offsetWidth; /* flush the jump before the transition comes back */
+          track.style.transition = '';
+        }
+      }
+
+      function shift(dir) {
+        if (busy) return;
+        index = (index + dir + n) % n;
+        pos += dir;
+        render(true);
+        if (pos !== 0 && pos !== n + 1) return;
+
+        /* we animated onto a clone: once it settles, jump to the real one */
+        busy = true;
+        const settle = () => { pos = index + 1; render(false); busy = false; };
+        const ms = parseFloat(getComputedStyle(track).transitionDuration) * 1000;
+        if (!ms) { settle(); return; }
+        track.addEventListener('transitionend', function once(e) {
+          if (e.target !== track || e.propertyName !== 'transform') return;
+          track.removeEventListener('transitionend', once);
+          settle();
+        });
+        setTimeout(() => { if (busy) settle(); }, ms + 150);
+      }
+
+      prev.addEventListener('click', () => shift(-1));
+      next.addEventListener('click', () => shift(1));
+
+      /* clicking whichever slide is peeking in brings it forward */
+      items.forEach((el, i) => {
+        el.addEventListener('click', () => {
+          if (busy || i === pos) return;
+          shift(i > pos ? 1 : -1);
+        });
+      });
+
+      gallery.addEventListener('keydown', e => {
+        if (e.key === 'ArrowRight') { e.preventDefault(); shift(1); }
+        if (e.key === 'ArrowLeft') { e.preventDefault(); shift(-1); }
+      });
+
+      let startX = null;
+      gallery.addEventListener('pointerdown', e => { startX = e.clientX; });
+      gallery.addEventListener('pointerup', e => {
+        if (startX === null) return;
+        const dx = e.clientX - startX;
+        if (Math.abs(dx) > 40) shift(dx < 0 ? 1 : -1);
+        startX = null;
+      });
+
+      window.addEventListener('resize', () => render(false));
+      render(false);
+    });
+
+  </script>
+</body>
+</html>

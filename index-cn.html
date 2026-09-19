@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Yufei Li</title>
+<title>李雨菲</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500&family=Inter:wght@400;500&display=swap" rel="stylesheet">
@@ -50,7 +50,7 @@
     flex-direction: column;
     background: var(--bg);
     color: var(--ink);
-    font-family: 'Geist', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    font-family: 'Geist', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', Roboto, Helvetica, Arial, sans-serif;
     font-weight: 400;
     transition: background 0.3s ease, color 0.3s ease;
   }
@@ -241,27 +241,27 @@
       </svg>
 
       <header class="intro">
-        <h1>Yufei Li</h1>
+        <h1>李雨菲</h1>
       </header>
 
       <!-- <section class="about">
-        <p class="label">About</p>
-        <p>Design learning experiences that prepare minds for what comes next.</p>
+        <p class="label">关于</p>
+        <p>设计学习体验，为未来做好准备。</p>
       </section> -->
 
       <section>
-        <p class="label">Projects</p>
+        <p class="label">项目</p>
         <div class="link-list">
-          <a class="link" href="./X-Academy-en.html">X Academy</a>
-          <a class="link" href="./yale-accounting-course-en.html">Yale Accounting Pre-work Course</a>          
+          <a class="link" href="./X-Academy-cn.html">X Academy</a>
+          <a class="link" href="./yale-accounting-course-cn.html">耶鲁会计先修课程</a>          
         </div>
       </section>
 
       <section>
-        <p class="label">More &amp; Connect</p>
+        <p class="label">更多与联系</p>
         <div class="link-list">
-          <a class="link" href="./resume.pdf" target="_blank" rel="noopener noreferrer">Resume</a>
-          <a class="link" href="mailto:yufeili1025@gmail.com">Email</a>
+          <a class="link" href="./resume-cn.pdf" target="_blank" rel="noopener noreferrer">简历</a>
+          <a class="link" href="mailto:yufeili1025@gmail.com">邮箱</a>
         </div>
       </section>
     </div>
@@ -270,7 +270,7 @@
   <footer>
     <div class="footer-inner">
       <span class="copyright">© 2026</span>
-      <button class="lang-btn" id="langToggle" aria-label="Switch language">中/EN</button>
+      <button class="lang-btn" id="langToggle" aria-label="切换语言">中/EN</button>
     </div>
   </footer>
 
@@ -284,13 +284,13 @@
       body.classList.add('enter');
     });
 
-    /* ---- language switch: go to Chinese version ---- */
+    /* ---- language switch: go back to English version ---- */
     (function() {
       const langBtn = document.getElementById('langToggle');
-      const CN_VERSION_URL = 'index-cn.html';   // ← Chinese version
+      const EN_VERSION_URL = 'index.html';   // ← English version
 
       langBtn.addEventListener('click', function() {
-        window.location.href = CN_VERSION_URL;
+        window.location.href = EN_VERSION_URL;
       });
     })();
   </script>

@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>X Academy 助教案例研究</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  /* ---- shared tokens ---- */
+  :root {
+    --bg: #ffffff;
+    --ink: #000000;
+    --grey: #737373;
+    --grey-line: #c4c4c4;
+    --grey-dim: #a3a3a3;
+    --rule: #e5e5e5;
+    --panel: #f5f5f5;
+    --tennis: #d7e34b;
+    --seam: #ffffff;
+
+    --mark-size: clamp(23px, 2.6vh, 28px);
+    --fs-h1: clamp(15px, 1.7vh, 18px);
+    --fs-heading: clamp(15px, 1.7vh, 18px);
+    --fs-body: clamp(15px, 1.7vh, 18px);
+    --fs-small: clamp(13px, 1.5vh, 15px);
+    --fs-footer: clamp(14px, 1.6vh, 16px);
+
+    --sp-mark: clamp(16px, 3.4vh, 44px);
+    --sp-intro: clamp(22px, 4.6vh, 56px);
+    --sp-section: clamp(20px, 4.2vh, 50px);
+    --sp-label: clamp(10px, 2vh, 18px);
+    --sp-para: clamp(6px, 1.2vh, 12px);
+    --sp-list: clamp(7px, 1.4vh, 12px);
+
+    --sp-top: clamp(24px, 6vh, 64px);
+    --gutter: clamp(24px, 8vw, 120px);
+    --measure: 470px;
+  }
+
+  * { box-sizing: border-box; }
+  html { color-scheme: light; scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Geist', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', Roboto, Helvetica, Arial, sans-serif;
+    font-weight: 400;
+    transition: background 0.3s ease, color 0.3s ease;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    body, a { transition: none !important; }
+    .mark-ball, .mark-back, .mark-label { transition: opacity 0.01s linear !important; }
+    .mark-back, .mark-link:hover .mark-ball { transform: none !important; }
+    .pager-home:hover { transform: none !important; }
+  }
+
+  .page {
+    flex: 1;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr minmax(0, 560px) 1fr;
+    padding: var(--sp-top) var(--gutter) 0;
+  }
+
+  .content { grid-column: 2; min-width: 0; }
+
+  /* ---- section rail ---- */
+  .toc {
+    grid-column: 3;
+    justify-self: start;
+    align-self: start;
+    min-width: 0;
+    position: sticky;
+    top: 50%;
+    transform: translateY(-50%);
+    margin-left: clamp(195px, 13vw, 230px);
+    pointer-events: none;
+  }
+
+  .toc a { pointer-events: auto; }
+
+  .toc-inner { border-left: 1px solid var(--rule); }
+
+  .toc a {
+    position: relative;
+    display: block;
+    padding: 5px 0 5px 16px;
+    font-size: var(--fs-body);
+    line-height: 1.5;
+    color: var(--grey-dim);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: color 0.2s ease;
+  }
+
+  .toc a::before {
+    content: "";
+    position: absolute;
+    left: -1px;
+    top: 5px;
+    bottom: 5px;
+    width: 2px;
+    background: var(--ink);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  .toc a:hover { color: var(--grey); }
+
+  .toc a.active { color: var(--ink); }
+  .toc a.active::before { opacity: 1; }
+
+  @media (max-width: 1400px) {
+    .toc { display: none; }
+  }
+
+  a { color: inherit; }
+
+  a.link {
+    font-size: var(--fs-body);
+    color: var(--grey);
+    text-decoration: underline;
+    text-decoration-color: var(--grey-line);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+    transition: color 0.15s ease, text-decoration-color 0.15s ease;
+  }
+
+  a.link:hover, a.link:focus-visible {
+    color: var(--ink);
+    text-decoration-color: var(--grey);
+  }
+
+  .mark-link {
+    position: relative;
+    display: inline-block;
+    width: var(--mark-size);
+    height: var(--mark-size);
+    margin-bottom: var(--sp-mark);
+    text-decoration: none;
+    border-radius: 50%;
+  }
+
+  .mark-ball,
+  .mark-back {
+    position: absolute;
+    inset: 0;
+    transition: opacity 0.28s ease, transform 0.28s ease;
+  }
+
+  .mark-ball svg,
+  .mark-back svg { display: block; width: 100%; height: 100%; }
+
+  .mark-ball { opacity: 1; transform: rotate(0deg) scale(1); }
+  .mark-back { opacity: 0; transform: rotate(-90deg) scale(0.6); }
+
+  .mark-link:hover .mark-ball,
+  .mark-link:focus-visible .mark-ball {
+    opacity: 0;
+    transform: rotate(-90deg) scale(0.6);
+  }
+
+  .mark-link:hover .mark-back,
+  .mark-link:focus-visible .mark-back {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+  }
+
+  .mark-label {
+    position: absolute;
+    left: calc(var(--mark-size) + 12px);
+    top: 50%;
+    transform: translateY(-50%) translateX(-6px);
+    white-space: nowrap;
+    font-size: var(--fs-footer);
+    color: var(--grey);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.28s ease, transform 0.28s ease;
+  }
+
+  .mark-link:hover .mark-label,
+  .mark-link:focus-visible .mark-label {
+    opacity: 1;
+    transform: translateY(-50%) translateX(0);
+  }
+
+  h1 {
+    font-size: var(--fs-h1);
+    font-weight: 400;
+    letter-spacing: -0.005em;
+    line-height: 1.35;
+    margin: 0 0 var(--sp-intro);
+    color: var(--ink);
+  }
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 8px 32px;
+    padding: var(--sp-label) 0;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: var(--sp-intro);
+  }
+
+  .meta div:last-child { text-align: right; align-items: flex-end; }
+
+  .meta div { display: flex; flex-direction: column; }
+  .meta .k { color: var(--grey-dim); font-size: var(--fs-small); }
+  .meta .v { color: var(--ink); font-size: var(--fs-body); }
+
+  section { margin-bottom: var(--sp-section); scroll-margin-top: var(--sp-top); }
+
+  h2 {
+    font-size: var(--fs-heading);
+    font-weight: 400;
+    letter-spacing: -0.005em;
+    margin: 0 0 var(--sp-label);
+    color: var(--ink);
+  }
+
+  p {
+    font-size: var(--fs-body);
+    line-height: 1.6;
+    color: var(--grey);
+    margin: 0 0 var(--sp-para);
+  }
+
+  p:last-child { margin-bottom: 0; }
+
+  strong { font-weight: 400; color: var(--ink); }
+
+  /* ---- inline content images ---- */
+  .img-container {
+    margin: var(--sp-label) 0;
+    width: 100%;
+    overflow: hidden;
+    border-radius: 8px;
+    border: 1px solid var(--rule);
+    background: var(--panel);
+  }
+
+  .img-container img {
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+  }
+
+  /* ---- info cards ---- */
+  .info-cards {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin: var(--sp-label) 0;
+  }
+
+  .info-cards.is-three {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .info-card {
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    padding: 18px;
+  }
+
+  .info-card h4 {
+    font-size: var(--fs-body);
+    font-weight: 400;
+    color: var(--ink);
+    margin: 0 0 7px;
+    letter-spacing: -0.005em;
+  }
+
+  .info-card p {
+    font-size: var(--fs-small);
+    line-height: 1.5;
+    color: var(--grey);
+    margin: 0;
+  }
+
+  @media (max-width: 768px) {
+    .info-cards.is-three { grid-template-columns: 1fr; }
+  }
+
+  /* ---- course structure box ---- */
+  .structure { margin: var(--sp-label) 0 var(--sp-section); }
+
+  .structure-box {
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    padding: 18px;
+  }
+
+  .structure-phase {
+    display: block;
+    font-size: var(--fs-small);
+    color: var(--grey-dim);
+    margin-bottom: 9px;
+  }
+
+  .structure-box .modules { margin-top: 0; }
+
+  .structure-box .module {
+    border-color: transparent;
+    background: var(--panel);
+  }
+
+  /* ---- module cards ---- */
+  .modules {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: var(--sp-label);
+  }
+
+  .module {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    padding: 16px;
+  }
+
+  .module-n {
+    display: block;
+    font-size: var(--fs-small);
+    color: var(--grey-dim);
+    line-height: 1;
+    margin-bottom: 7px;
+  }
+
+  .module h4 {
+    font-size: var(--fs-body);
+    font-weight: 400;
+    color: var(--ink);
+    margin: 0 0 5px;
+    letter-spacing: -0.005em;
+  }
+
+  .module p {
+    font-size: var(--fs-small);
+    line-height: 1.5;
+    color: var(--grey);
+    margin: 0;
+  }
+
+  .module-open {
+    font: inherit;
+    text-align: left;
+    width: 100%;
+    background: var(--panel);
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+  }
+
+  .structure-box .module-open { border-color: var(--rule); }
+
+  .structure-box .module-open:hover,
+  .module-open:focus-visible { border-color: var(--grey-line); }
+
+  .module-cue {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: auto;
+    padding-top: 12px;
+    font-size: var(--fs-small);
+    color: var(--grey-dim);
+    transition: color 0.2s ease;
+  }
+
+  .module-open:hover .module-cue,
+  .module-open:focus-visible .module-cue { color: var(--ink); }
+
+  .module-cue svg {
+    width: 12px;
+    height: 12px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+  }
+
+  /* ---- lesson screens dialog ---- */
+  .screens[open] {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .screens {
+    width: min(720px, 92vw);
+    max-height: min(85vh, 760px);
+    padding: 0;
+    background: var(--bg);
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    color: var(--ink);
+    overflow: hidden;
+  }
+
+  .screens::backdrop { background: rgba(0, 0, 0, 0.45); }
+
+  .screens-bar {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 13px 18px;
+    border-bottom: 1px solid var(--rule);
+    background: var(--bg);
+  }
+
+  .screens-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px 5px 6px;
+    font: inherit;
+    font-size: var(--fs-small);
+    color: var(--grey);
+    background: none;
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: color 0.2s ease, border-color 0.2s ease;
+  }
+
+  .screens-back:hover {
+    color: var(--ink);
+    border-color: var(--grey-line);
+  }
+
+  .screens-back svg {
+    width: 13px;
+    height: 13px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+  }
+
+  .screens-title {
+    font-size: var(--fs-small);
+    color: var(--grey-dim);
+  }
+
+  .screens-body {
+    flex: 1 1 auto;
+    padding: 24px;
+    overflow-y: auto;
+  }
+
+  .lab-detail-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .lab-detail-list > li {
+    margin-bottom: 16px;
+    font-size: var(--fs-body);
+    line-height: 1.6;
+    color: var(--grey);
+  }
+
+  .lab-detail-list > li:last-child {
+    margin-bottom: 0;
+  }
+
+  .lab-detail-list strong {
+    color: var(--ink);
+  }
+
+  .lab-sublist {
+    margin: 8px 0 0 0;
+    padding-left: 20px;
+    list-style-type: disc;
+  }
+
+  .lab-sublist li {
+    margin-bottom: 8px;
+    font-size: var(--fs-body);
+    line-height: 1.6;
+    color: var(--grey);
+  }
+
+  .lab-sublist li:last-child {
+    margin-bottom: 0;
+  }
+
+  .slides-link-container {
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--rule);
+  }
+
+  /* ---- tech tag styles ---- */
+  .tech-tag-container {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-left: 4px;
+    vertical-align: middle;
+  }
+
+  .tech-tag {
+    display: inline-block;
+    background-color: var(--panel);
+    border: 1px solid var(--rule);
+    color: var(--ink);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: var(--fs-small);
+    font-weight: 400;
+  }
+
+  @media (max-width: 640px) {
+    .modules { grid-template-columns: 1fr; }
+  }
+
+  figcaption {
+    margin-top: 12px;
+    font-size: var(--fs-small);
+    color: var(--grey-dim);
+    text-align: center;
+  }
+
+  .pager {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 18px;
+    border-top: 1px solid var(--rule);
+    padding-top: var(--sp-label);
+    margin-top: var(--sp-intro);
+  }
+
+  .pager .k {
+    display: block;
+    font-size: var(--fs-small);
+    color: var(--grey-dim);
+    margin-bottom: 8px;
+  }
+
+  .pager-prev { text-align: left; }
+  .pager-next { text-align: right; }
+
+  .pager-prev:empty, .pager-next:empty { min-height: 1px; }
+
+  .pager-home {
+    display: block;
+    width: var(--mark-size);
+    height: var(--mark-size);
+    transition: transform 0.2s ease;
+  }
+
+  .pager-home svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .pager-home:hover { transform: translateY(-3px); }
+
+  @media (max-width: 420px) {
+    .pager { gap: 12px; }
+  }
+
+  a:focus-visible, button:focus-visible {
+    outline: 2px solid var(--grey);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;   /* ← add this */
+  max-width: 560px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 16px var(--gutter) 24px;
+  font-size: var(--fs-footer);
+}
+
+  .copyright { color: var(--grey-dim); }
+
+  @media (max-width: 480px) {
+    .page { padding: var(--sp-top) clamp(20px, 8vw, 40px) 0; }
+    footer { padding: 14px clamp(20px, 8vw, 40px) 20px; }
+  }
+</style>
+</head>
+
+<body>
+  <div class="page">
+    <div class="content">
+      <a class="mark-link" href="index-cn.html" aria-label="返回首页">
+        <span class="mark-ball">
+          <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <circle cx="20" cy="20" r="19" fill="var(--tennis)"/>
+            <g fill="none" stroke="var(--seam)" stroke-width="2" stroke-linecap="round">
+              <path d="M6 7c8 7 8 19 0 26"/>
+              <path d="M34 7c-8 7-8 19 0 26"/>
+            </g>
+          </svg>
+        </span>
+        <span class="mark-back" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6" fill="none" stroke="currentColor"
+            stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+        <span class="mark-label">返回</span>
+      </a>
+
+      <h1>X Academy 助教与社区负责人</h1>
+
+      <div class="meta">
+        <div><span class="k">角色</span><span class="v">助教与活动组织者</span></div>
+        <div><span class="k">时间</span><span class="v">2023 &ndash; 2025 年暑期</span></div>
+      </div>
+
+      <section id="overview">
+        <h2>概述</h2>
+        <p><a class="link" href="https://info.xacademy.cc/en/" target="_blank" rel="noopener noreferrer">X Academy</a> 是一个为期两周的科技夏令营，主要面向国际高中生，每年服务约 300 名学生，平均班级规模约 25 人。作为《数据科学导论》（2023）和《自然语言处理》（2024）课程的助教，我参与共同开发课程体系、设计并主持实验课，并指导学生的毕业项目。2025 年，作为课外活动组织者，我负责组织营队活动，并担任学生的主要协调人。</p>
+        
+        <!-- First Image -->
+        <figure class="img-container">
+          <img src="./images/xacademy.png" alt="X Academy 概览" loading="lazy">
+        </figure>
+      </section>
+
+      <section id="curriculum">
+        <h2>教学</h2>
+        <p>为了帮助学生更好地理解计算机科学概念，我根据学生的兴趣设计了实验练习，让抽象的理论和后端代码更易于理解。</p>
+
+        <figure class="structure">
+         <div class="modules">
+              <button type="button" class="module module-open" data-open-screens="ds-screens" aria-haspopup="dialog">
+                <span class="module-n">01 &middot; 数据科学</span>
+                <h4>数据清洗实验</h4>
+                <p>一个 90 分钟的实验，学生清洗、整合、推断并转换杂乱的真实众筹数据。</p>
+                <span class="module-cue">查看详情
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+              </button>
+
+              <button type="button" class="module module-open" data-open-screens="nlp-screens" aria-haspopup="dialog">
+                <span class="module-n">02 &middot; 自然语言处理</span>
+                <h4>语言模型与困惑度实验</h4>
+                <p>一个 90 分钟的实验，评估预构建的 N-gram 基础设施并实现困惑度评估引擎。</p>
+                <span class="module-cue">查看详情
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+              </button>
+            </div>
+        </figure>
+
+        <!-- Data Science Dialog -->
+        <dialog class="screens" id="ds-screens" aria-label="数据科学导论实验详情">
+          <div class="screens-bar">
+            <button type="button" class="screens-back" data-close-screens>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              返回
+            </button>
+            <span class="screens-title">01 &middot; 数据科学导论实验</span>
+          </div>
+          <div class="screens-body">
+            <ul class="lab-detail-list">
+              <li>
+                <strong>概述：</strong> 一个 90 分钟的动手数据科学实验，学生扮演学生会主席的角色，清洗、整合、推断并转换杂乱的真实校园众筹数据。
+              </li>
+              <li>
+                <strong>核心技术栈：</strong> 
+                <span class="tech-tag-container">
+                  <span class="tech-tag">Python</span>
+                  <span class="tech-tag">Jupyter Notebook</span>
+                  <span class="tech-tag">Pandas</span>
+                  <span class="tech-tag">数据清洗</span>
+                </span>
+              </li>
+              <li>
+                <strong>特点：</strong>
+                <ul class="lab-sublist">
+                  <li><strong>情境化学习：</strong> 使用贴近生活的校园慈善募捐数据集，包含 200+ 条杂乱记录，涉及货币文本、负异常值、空白键和缺失成绩。</li>
+                  <li><strong>认知框架构建：</strong> 建立 4 阶段思维模型（清洗、整合、推断、转换），让学生能够直观地审查原始数据集，并知道在未来数据项目中应执行哪些操作。</li>
+                </ul>
+              </li>
+            </ul>
+            <div class="slides-link-container">
+              <a class="link" href="./files/xa23_day4lab.pdf" target="_blank" rel="noopener noreferrer">点击此处查看实验课幻灯片</a>
+            </div>
+          </div>
+        </dialog>
+
+        <!-- NLP Dialog -->
+        <dialog class="screens" id="nlp-screens" aria-label="NLP 实验详情">
+          <div class="screens-bar">
+            <button type="button" class="screens-back" data-close-screens>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              返回
+            </button>
+            <span class="screens-title">02 &middot; NLP：语言模型与困惑度实验</span>
+          </div>
+          <div class="screens-body">
+            <ul class="lab-detail-list">
+              <li>
+                <strong>概述：</strong> 一个 90 分钟的动手 NLP 实验，高中生分析预构建的 N-gram 语言模型基础设施，并完成困惑度评估引擎，以评估语言模型的不确定性。
+              </li>
+              <li>
+                <strong>核心技术栈：</strong> 
+                <span class="tech-tag-container">
+                  <span class="tech-tag">Python</span>
+                  <span class="tech-tag">Jupyter Notebook</span>
+                  <span class="tech-tag">N-Gram 建模</span>
+                  <span class="tech-tag">困惑度</span>
+                </span>
+              </li>
+              <li>
+                <strong>特点：</strong>
+                <ul class="lab-sublist">
+                  <li><strong>阅读-理解-补全脚手架：</strong> 预实现数据预处理、分词和 N-gram 计数模块；卸载语法负担，让零基础学生能够完全专注于阅读、理解并补全核心评估逻辑。</li>
+                  <li><strong>流程图引导的概念映射：</strong> 使用可视化流程图描绘端到端数据管道（文本 &rarr; 词元 &rarr; N-gram &rarr; 概率 &rarr; 困惑度），帮助学生直观地追踪执行逻辑。</li>
+                </ul>
+              </li>
+            </ul>
+            <div class="slides-link-container">
+              <a class="link" href="./files/xa24_day8lab.pdf" target="_blank" rel="noopener noreferrer">点击此处查看实验课幻灯片</a>
+            </div>
+          </div>
+        </dialog>
+      </section>
+
+      <section id="extracurriculars">
+        <h2>课外活动</h2>
+        <p>除了课堂教学，我在 2025 年担任课外活动组织者，促进整个营队群体的社区建设。</p>
+
+        <div class="info-cards is-three">
+          <div class="info-card">
+            <h4>大型活动</h4>
+            <p>设计并主持了 3 场活动，组织约 300 名学生和工作人员参与。</p>
+          </div>
+          <div class="info-card">
+            <h4>游戏化参与</h4>
+            <p>开发了一套游戏化成就系统，推动学生参与所有营队活动。</p>
+          </div>
+          <div class="info-card">
+            <h4>小组辅导与指导</h4>
+            <p>作为导师带领 23 名学生的小组，管理学生沟通并担任主要协调人。</p>
+          </div>
+        </div>
+      </section>
+
+            <nav class="pager" aria-label="更多作品">
+        <div class="pager-prev"></div>
+
+        <a class="pager-home" href="index-cn.html" aria-label="返回首页">
+          <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <circle cx="20" cy="20" r="19" fill="var(--tennis)"/>
+            <g fill="none" stroke="var(--seam)" stroke-width="2" stroke-linecap="round">
+              <path d="M6 7c8 7 8 19 0 26"/>
+              <path d="M34 7c-8 7-8 19 0 26"/>
+            </g>
+          </svg>
+        </a>
+
+        <div class="pager-next">
+          <span class="k">下一个</span>
+          <a class="link" href="yale-accounting-course-cn.html">耶鲁会计先修课程</a>
+        </div>
+      </nav>
+    </div>
+
+    <nav class="toc" aria-label="章节">
+      <div class="toc-inner">
+        <a href="#overview">概述</a>
+        <a href="#curriculum">教学</a>
+        <a href="#extracurriculars">课外活动</a>
+      </div>
+    </nav>
+  </div>
+
+  <footer>
+    <span class="copyright">&copy; 2026</span>
+  </footer>
+
+  <script>
+    /* section rail: highlight whichever section is currently in view */
+    const tocLinks = Array.from(document.querySelectorAll('.toc a'));
+    const sections = tocLinks
+      .map(link => document.querySelector(link.getAttribute('href')))
+      .filter(Boolean);
+
+    function setActive() {
+      const marker = window.innerHeight * 0.3;
+      let index = 0;
+      sections.forEach((section, i) => {
+        if (section.getBoundingClientRect().top <= marker) index = i;
+      });
+      if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 4) {
+        index = sections.length - 1;
+      }
+      tocLinks.forEach((link, i) => link.classList.toggle('active', i === index));
+    }
+
+    let queued = false;
+    function onScroll() {
+      if (queued) return;
+      queued = true;
+      requestAnimationFrame(() => { setActive(); queued = false; });
+    }
+
+    setActive();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+
+    /* module cards that open their lesson screens in an overlay */
+    document.querySelectorAll('[data-open-screens]').forEach(trigger => {
+      const dialog = document.getElementById(trigger.dataset.openScreens);
+      if (!dialog) return;
+
+      trigger.addEventListener('click', () => {
+        dialog.showModal();
+      });
+
+      dialog.querySelectorAll('[data-close-screens]').forEach(btn => {
+        btn.addEventListener('click', () => dialog.close());
+      });
+
+      dialog.addEventListener('click', e => {
+        if (e.target === dialog) dialog.close();
+      });
+
+      dialog.addEventListener('close', () => trigger.focus());
+    });
+  </script>
+</body>
+</html>
